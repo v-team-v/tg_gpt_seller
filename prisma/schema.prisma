@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  telegramId  String   @unique
+  username    String?
+  firstName   String?
+  lastName    String?
+  source      String?  // utm source or referer
+  createdAt   DateTime @default(now())
+  orders      Order[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  price       Float    // Using Float for simplicity in SQLite, typically Decimal in Postgres
+  imageUrl    String?
+  type        String   @default("SUBSCRIPTION") // SUBSCRIPTION, ACCOUNT
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+}
+
+model Order {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  productId     Int
+  product       Product  @relation(fields: [productId], references: [id])
+  amount        Float
+  status        String   @default("PENDING") // PENDING, PAID, COMPLETED, CANCELED
+  yookassaId    String?  // Payment ID from Yookassa
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Settings {
+  id             Int     @id @default(autoincrement())
+  key            String  @unique // e.g., "manual_mode", "offline_message"
+  value          String?
+  description    String?
+}
