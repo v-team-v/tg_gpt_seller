@@ -175,7 +175,7 @@ bot.hears("Профиль", async (ctx) => {
 
     const keyboard = new InlineKeyboard()
         .text("📦 История заказов", "history")
-        .url("📜 Правила использования", rulesUrl);
+        .url("📜 Пользовательское соглашение (Оферта)", rulesUrl);
 
     await ctx.reply(text, { parse_mode: "HTML", reply_markup: keyboard });
 });
