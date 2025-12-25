@@ -46,8 +46,8 @@ export default function NewProductPage() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="imageUrl">URL Картинки (опционально)</Label>
-                            <Input id="imageUrl" name="imageUrl" placeholder="https://example.com/image.jpg" />
+                            <Label htmlFor="image">Изображение</Label>
+                            <Input id="image" name="image" type="file" accept="image/*" />
                         </div>
 
                         <div className="pt-4">

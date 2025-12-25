@@ -58,9 +58,11 @@ export default async function ProductsPage() {
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
                                             {/* Edit button would go here */}
-                                            <Button variant="ghost" size="icon">
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
+                                            <Link href={`/admin/products/${product.id}`}>
+                                                <Button variant="ghost" size="icon">
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                            </Link>
                                             {/* Delete button (client component needed for interactivity or form) handled later */}
                                         </div>
                                     </TableCell>

@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # 1. Admin Panel & API
+  web:
+    build: .
+    container_name: tg_shop_web
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=file:/app/data/dev.db
+    volumes:
+      - ./data:/app/data
+      - ./public:/app/public
+    command: node server.js
+
+  # 2. Telegram Bot
+  bot:
+    build: .
+    container_name: tg_shop_bot
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=file:/app/data/dev.db
+    volumes:
+      - ./data:/app/data
+      - ./public:/app/public
+    # Run the bot using tsx directly from node_modules. 
+    # Note: 'server.js' is for Next.js. We need to override command for bot.
+    command: npx tsx scripts/start-bot.ts
