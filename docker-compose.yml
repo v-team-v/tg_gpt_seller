@@ -12,6 +12,7 @@ services:
       - .env
     environment:
       - DATABASE_URL=file:/app/data/dev.db
+      - NODE_OPTIONS=--dns-result-order=ipv4first
     volumes:
       - ./data:/app/data
       - ./public:/app/public
@@ -26,9 +27,12 @@ services:
       - .env
     environment:
       - DATABASE_URL=file:/app/data/dev.db
+      - NODE_OPTIONS=--dns-result-order=ipv4first
     volumes:
       - ./data:/app/data
       - ./public:/app/public
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
     # Run the bot using tsx directly from node_modules. 
     # Note: 'server.js' is for Next.js. We need to override command for bot.
     command: npx tsx scripts/start-bot.ts
