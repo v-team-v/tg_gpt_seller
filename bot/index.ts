@@ -168,7 +168,7 @@ bot.hears("Профиль", async (ctx) => {
     const settings = await prisma.settings.findUnique({ where: { key: 'rules_url' } });
     const rulesUrl = settings?.value || "https://google.com";
 
-    const completedOrders = dbUser?.orders.filter(o => o.status === 'COMPLETED').length || 0;
+    const completedOrders = dbUser?.orders.filter(o => o.status === 'COMPLETED' || o.status === 'PAID').length || 0;
 
     // Simple profile stats
     const text = `👤 <b>Мой профиль:</b>\n\nID: <code>${user?.id}</code>\nИмя: ${user?.first_name}\nВсего заказов: ${completedOrders}`;
@@ -323,16 +323,66 @@ bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
 Необходимо оплатить до ${timeString}
 ➖➖➖➖➖➖➖➖➖➖➖`;
 
-    // Payment Button (Placeholder for now)
+    // Payment Button
+    const { generatePaymentUrl } = require('../lib/robokassa');
+    const paymentUrl = generatePaymentUrl({
+        amount: product.price,
+        orderId: publicOrderId, // Use Public ID for Robokassa
+        description: `Оплата заказа #${publicOrderId} (ChatGPT Plus)`
+    });
+
     const keyboard = new InlineKeyboard()
-        .url("Перейти к оплате", `https://yoomoney.ru/checkout?order=${publicOrderId}`); // Fake link for now
+        .url(`Оплатить ${product.price} ₽`, paymentUrl);
 
     await ctx.reply(text, { parse_mode: "HTML", reply_markup: keyboard });
 });
 
-// History stub
+// History Handler
 bot.callbackQuery("history", async (ctx) => {
-    await ctx.answerCallbackQuery("История заказов скоро появится!");
+    const userId = ctx.from.id.toString();
+    const dbUser = await prisma.user.findUnique({
+        where: { telegramId: userId },
+        include: {
+            orders: {
+                include: { product: true },
+                orderBy: { createdAt: 'desc' },
+                take: 10
+            }
+        }
+    });
+
+    if (!dbUser || dbUser.orders.length === 0) {
+        await ctx.answerCallbackQuery("История заказов пуста");
+        return;
+    }
+
+    let text = "📦 <b>История последних заказов:</b>\n\n";
+
+    // Status Translation
+    const statusMap: Record<string, string> = {
+        'PENDING': '⏳ Ожидает оплаты',
+        'PAID': '✅ Оплачен',
+        'COMPLETED': '🚀 Выдан',
+        'CANCELED': '❌ Отменен'
+    };
+
+    for (const order of dbUser.orders) {
+        const publicOrderId = 27654423 + order.id;
+        const status = statusMap[order.status] || order.status;
+        const date = new Date(order.createdAt).toLocaleDateString('ru-RU', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        text += `🔹 <b>Заказ #${publicOrderId}</b>\n`;
+        text += `Товар: ${order.product.title}\n`;
+        text += `Статус: ${status}\n`;
+        text += `Дата: ${date}\n`;
+        text += `➖➖➖➖➖➖➖➖\n`;
+    }
+
+    await ctx.reply(text, { parse_mode: "HTML" });
+    await ctx.answerCallbackQuery();
 });
 
 
