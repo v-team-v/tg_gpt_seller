@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
 
-export function Search({ placeholder }: { placeholder: string }) {
+export function Search({ placeholder, queryKey = 'q' }: { placeholder: string; queryKey?: string }) {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
@@ -12,9 +12,9 @@ export function Search({ placeholder }: { placeholder: string }) {
     const handleSearch = useDebouncedCallback((term: string) => {
         const params = new URLSearchParams(searchParams);
         if (term) {
-            params.set('q', term);
+            params.set(queryKey, term);
         } else {
-            params.delete('q');
+            params.delete(queryKey);
         }
         replace(`${pathname}?${params.toString()}`);
     }, 300);
@@ -25,7 +25,7 @@ export function Search({ placeholder }: { placeholder: string }) {
                 className="w-full max-w-sm"
                 placeholder={placeholder}
                 onChange={(e) => handleSearch(e.target.value)}
-                defaultValue={searchParams.get('q')?.toString()}
+                defaultValue={searchParams.get(queryKey)?.toString()}
             />
         </div>
     );

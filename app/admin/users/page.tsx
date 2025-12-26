@@ -36,7 +36,7 @@ export default async function UsersPage(props: {
     }
 
     if (sourceFilter) {
-        where.source = sourceFilter;
+        where.source = { contains: sourceFilter };
     }
 
     const users = await prisma.user.findMany({
@@ -50,19 +50,6 @@ export default async function UsersPage(props: {
         take: 100,
     });
 
-    // Fetch distinct sources for filter
-    // Prisma doesn't support distinct select easily with findMany typesafe sometimes, 
-    // but we can group by.
-    const sourcesGroup = await prisma.user.groupBy({
-        by: ['source'],
-        _count: {
-            source: true
-        },
-        where: {
-            source: { not: null }
-        }
-    });
-
     return (
         <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
@@ -71,24 +58,16 @@ export default async function UsersPage(props: {
 
             <div className="flex gap-4 items-center">
                 <Search placeholder="Поиск по ID, имени, username..." />
+                <Search placeholder="Фильтр по источнику..." queryKey="source" />
 
-                {/* Simple Source Filter Link Generator */}
-                <div className="flex gap-2">
+                {/* Clear Filters */}
+                {(query || sourceFilter) && (
                     <Link href="/admin/users">
-                        <Badge variant={!sourceFilter ? "default" : "outline"} className="cursor-pointer">
-                            Все
+                        <Badge variant="outline" className="cursor-pointer hover:bg-slate-100">
+                            Сбросить
                         </Badge>
                     </Link>
-                    {sourcesGroup.map((s) => (
-                        s.source && (
-                            <Link key={s.source} href={`/admin/users?source=${s.source}`}>
-                                <Badge variant={sourceFilter === s.source ? "default" : "outline"} className="cursor-pointer">
-                                    {s.source} ({s._count.source})
-                                </Badge>
-                            </Link>
-                        )
-                    ))}
-                </div>
+                )}
             </div>
 
             <Card>
