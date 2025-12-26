@@ -71,6 +71,15 @@ export async function toggleProductStatus(id: number) {
 }
 
 export async function deleteProduct(id: number) {
-    await prisma.product.delete({ where: { id } });
-    revalidatePath('/admin/products');
+    try {
+        await prisma.product.delete({ where: { id } });
+        revalidatePath('/admin/products');
+        return { success: true };
+    } catch (error: any) {
+        if (error.code === 'P2003') {
+            // Foreign key constraint violated
+            return { success: false, error: 'Cannot delete product with existing orders. Archive it instead.' };
+        }
+        return { success: false, error: 'Failed to delete product.' };
+    }
 }
