@@ -12,10 +12,7 @@ export function BotLink({ className, baseHref = "https://t.me/gpt_sub_bot", chil
     const [href, setHref] = useState(baseHref);
 
     useEffect(() => {
-        let attempts = 0;
-        const maxAttempts = 5; // Try for 2.5 seconds max
-
-        const getClientId = () => {
+        const interval = setInterval(() => {
             // @ts-ignore
             if (window.ym) {
                 try {
@@ -23,19 +20,16 @@ export function BotLink({ className, baseHref = "https://t.me/gpt_sub_bot", chil
                     window.ym(99122777, 'getClientID', (clientID) => {
                         if (clientID) {
                             setHref(`${baseHref}?start=${clientID}`);
+                            clearInterval(interval);
                         }
                     });
                 } catch (e) {
                     console.error("Yandex Metrika error:", e);
                 }
-            } else if (attempts < maxAttempts) {
-                attempts++;
-                setTimeout(getClientId, 500);
             }
-        };
+        }, 500);
 
-        // Start checking (non-blocking)
-        setTimeout(getClientId, 100);
+        return () => clearInterval(interval);
     }, [baseHref]);
 
     return (

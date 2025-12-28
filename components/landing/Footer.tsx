@@ -35,13 +35,12 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h4 className="font-bold mb-4">Контакты</h4>
+                        <h4 className="font-bold mb-4">Реквизиты</h4>
                         <ul className="space-y-3 text-sm text-muted-foreground">
-                            <li>
-                                <BotLink className="flex items-center gap-2 hover:text-foreground transition-colors">
-                                    <Send size={16} /> gpt_sub_bot
-                                </BotLink>
-                            </li>
+                            <li>ИП Киселев Владимир Ильич</li>
+                            <li>ИНН: 525718619554</li>
+                            <li>ОГРНИП: 325527500093012</li>
+                            <li>Юридический адрес: г. Нижний Новгород, 603107, пр-кт Гагарина д.99 к2</li>
                         </ul>
                     </div>
                 </div>

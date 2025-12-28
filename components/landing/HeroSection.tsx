@@ -9,16 +9,15 @@ export function HeroSection() {
             {/* <div className="absolute bottom-0 right-0 w-[400px] h-[300px] bg-secondary/20 blur-[50px] rounded-full pointer-events-none" /> */}
 
             <div className="container mx-auto px-4 relative z-10 text-center">
-                <div className="inline-flex items-center gap-2 bg-muted/50 px-4 py-1.5 rounded-full text-sm font-medium mb-8">
-                    <span>Оплата картами РФ</span>
-                </div>
-
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-                    Получите доступ к передовым ИИ моделям OpenAI и анализу данных прямо сейчас.
+                    Поможем с оплатой ChatGPT Plus в России <br />
+                    <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
+                        Продлим подписку или активируем новый аккаунт
+                    </span>
                 </h1>
 
                 <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-                    Оплата российскими картами, быстрая активация.
+                    Оплата российскими картами или по QR коду
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
