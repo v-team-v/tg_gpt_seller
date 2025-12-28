@@ -12,19 +12,7 @@ export function BotLink({ className, baseHref = "https://t.me/gpt_sub_bot", chil
     const [href, setHref] = useState(baseHref);
 
     useEffect(() => {
-        // @ts-ignore
-        /* if (window.ym) {
-            // @ts-ignore
-            window.ym(106059751, 'getClientID', (clientID) => {
-                if (clientID) {
-                    setHref(`${baseHref}?start=ym_${clientID}`);
-                    clearInterval(interval);
-                }
-            });
-        } */
-        clearInterval(interval);
-
-        return () => clearInterval(interval);
+        // Yandex Metrika polling disabled to fix Safari blocking
     }, [baseHref]);
 
     return (
