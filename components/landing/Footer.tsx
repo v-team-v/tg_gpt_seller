@@ -11,7 +11,7 @@ export function Footer() {
                             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                                 <Bot size={20} />
                             </div>
-                            <span>Sell GPT</span>
+                            <span>ChatGPT Plus</span>
                         </Link>
                         <p className="text-muted-foreground max-w-sm">
                             Ваш надежный проводник в мир искусственного интеллекта.
@@ -32,8 +32,8 @@ export function Footer() {
                         <h4 className="font-bold mb-4">Контакты</h4>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
-                                <a href="https://t.me/Gpt_seller_bot" target="_blank" className="flex items-center gap-2 hover:text-foreground transition-colors">
-                                    <Send size={16} /> Telegram Bot
+                                <a href="https://t.me/gpt_sub_bot" target="_blank" className="flex items-center gap-2 hover:text-foreground transition-colors">
+                                    <Send size={16} /> gpt_sub_bot
                                 </a>
                             </li>
                             <li>E-mail: support@chatgpt-plus.ru</li>
@@ -42,7 +42,7 @@ export function Footer() {
                 </div>
 
                 <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-                    <p>© {new Date().getFullYear()} Sell GPT. Все права защищены.</p>
+                    <p>© {new Date().getFullYear()} ChatGPT Plus. Все права защищены.</p>
                     <div className="flex items-center gap-6">
                         <Link href="/rules" className="hover:text-foreground transition-colors">Пользовательское соглашение</Link>
                         <Link href="/privacy" className="hover:text-foreground transition-colors">Политика конфиденциальности</Link>

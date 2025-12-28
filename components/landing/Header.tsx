@@ -9,7 +9,7 @@ export function Header() {
                     <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                         <Bot size={20} />
                     </div>
-                    <span>Sell GPT</span>
+                    <span>ChatGPT Plus</span>
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -19,12 +19,12 @@ export function Header() {
                 </nav>
 
                 <a
-                    href="https://t.me/Gpt_seller_bot"
+                    href="https://t.me/gpt_sub_bot"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
                 >
-                    Перейти в бота
+                    Купить подписку
                 </a>
             </div>
         </header>

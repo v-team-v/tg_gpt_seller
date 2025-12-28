@@ -28,7 +28,7 @@ export function HeroSection() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
                     <BotLink className="h-12 px-8 rounded-full bg-primary text-primary-foreground font-medium flex items-center gap-2 hover:opacity-90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/25">
-                        Начать пользоваться
+                        Купить подписку
                         <ArrowRight size={18} />
                     </BotLink>
                     <a
