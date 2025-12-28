@@ -17,9 +17,11 @@ export function BotLink({ className, baseHref = "https://t.me/gpt_sub_bot", chil
             if (window.ym) {
                 try {
                     // @ts-ignore
-                    window.ym(99122777, 'getClientID', (clientID) => {
+                    window.ym(106059751, 'getClientID', (clientID) => {
                         if (clientID) {
-                            setHref(`${baseHref}?start=${clientID}`);
+                            // Telegram deep links don't support dots. Replace with underscore.
+                            const sanitizedID = clientID.replace(/\./g, '_');
+                            setHref(`${baseHref}?start=ym_${sanitizedID}`);
                             clearInterval(interval);
                         }
                     });

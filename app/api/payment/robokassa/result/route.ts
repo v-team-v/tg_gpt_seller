@@ -61,9 +61,13 @@ export async function POST(req: NextRequest) {
         });
 
         // Send Analytics
-        if (order.user.source && order.user.source.startsWith('ym_')) {
-            const { sendMetricaConversion } = await import('@/lib/analytics');
-            await sendMetricaConversion(order.user.source, order.amount);
+        if (order.user.yandexClientId) {
+            const { sendMetricaHit } = await import('@/lib/analytics');
+            await sendMetricaHit({
+                clientId: order.user.yandexClientId,
+                target: 'payment_success',
+                revenue: order.amount
+            });
         }
 
         // Notify User

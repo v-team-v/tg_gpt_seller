@@ -58,6 +58,16 @@ bot.command('start', async (ctx) => {
     const user = ctx.from;
     if (!user) return;
 
+    let source = ctx.match ? ctx.match.toString() : null;
+    let yandexClientId = null;
+
+    // Check for Yandex Metrica deep link (ym_...)
+    if (source && source.startsWith('ym_')) {
+        const rawId = source.replace(/^ym_/, '');
+        // Restore dots: ym_123_456 -> 123.456
+        yandexClientId = rawId.replace(/_/, '.');
+    }
+
     // Upsert User
     await prisma.user.upsert({
         where: { telegramId: user.id.toString() },
@@ -65,13 +75,16 @@ bot.command('start', async (ctx) => {
             username: user.username,
             firstName: user.first_name,
             lastName: user.last_name,
+            source: source,
+            yandexClientId: yandexClientId,
         },
         create: {
             telegramId: user.id.toString(),
             username: user.username,
             firstName: user.first_name,
             lastName: user.last_name,
-            source: ctx.match ? ctx.match.toString() : null,
+            source: source,
+            yandexClientId: yandexClientId,
         },
     });
 

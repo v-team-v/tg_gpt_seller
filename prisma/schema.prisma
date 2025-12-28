@@ -17,6 +17,7 @@ model User {
   firstName   String?
   lastName    String?
   source      String?  // utm source or referer
+  yandexClientId String?
   createdAt   DateTime @default(now())
   orders      Order[]
 }
