@@ -16,6 +16,22 @@ export const metadata: Metadata = {
   title: "ChatGPT Plus",
   description: "Доступ к ChatGPT-4 и DALL-E 3 без ограничений в России",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
+  openGraph: {
+    title: "ChatGPT Plus",
+    description: "Доступ к ChatGPT-4 и DALL-E 3 без ограничений в России",
+    url: "https://chatgpt-plus.ru",
+    siteName: "ChatGPT Plus",
+    type: "website",
+    locale: "ru_RU",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ChatGPT Plus",
+    description: "Доступ к ChatGPT-4 и DALL-E 3 без ограничений в России",
+  },
+  other: {
+    "yandex-verification": "no-preview"
+  }
 };
 
 import { Suspense } from "react";
