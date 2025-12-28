@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Bot, Youtube, Twitter, Send } from "lucide-react";
 
+import { BotLink } from "./BotLink";
+
 export function Footer() {
     return (
         <footer className="bg-muted/50 border-t border-border py-12">
@@ -24,7 +26,6 @@ export function Footer() {
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li><Link href="#features" className="hover:text-foreground transition-colors">Преимущества</Link></li>
                             <li><Link href="#pricing" className="hover:text-foreground transition-colors">Тарифы</Link></li>
-                            <li><Link href="/admin" prefetch={false} className="hover:text-foreground transition-colors">Вход для админа</Link></li>
                         </ul>
                     </div>
 
@@ -32,9 +33,9 @@ export function Footer() {
                         <h4 className="font-bold mb-4">Контакты</h4>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
-                                <a href="https://t.me/gpt_sub_bot" target="_blank" className="flex items-center gap-2 hover:text-foreground transition-colors">
+                                <BotLink className="flex items-center gap-2 hover:text-foreground transition-colors">
                                     <Send size={16} /> gpt_sub_bot
-                                </a>
+                                </BotLink>
                             </li>
                             <li>E-mail: support@chatgpt-plus.ru</li>
                         </ul>
