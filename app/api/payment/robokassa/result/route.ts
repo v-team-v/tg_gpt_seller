@@ -60,6 +60,12 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        // Send Analytics
+        if (order.user.source && order.user.source.startsWith('ym_')) {
+            const { sendMetricaConversion } = await import('@/lib/analytics');
+            await sendMetricaConversion(order.user.source, order.amount);
+        }
+
         // Notify User
         try {
             await bot.api.sendMessage(

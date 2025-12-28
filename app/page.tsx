@@ -1,5 +1,19 @@
-import { redirect } from 'next/navigation';
+import { Header } from "@/components/landing/Header";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { ProductsSection } from "@/components/landing/ProductsSection";
+import { AdvantagesSection } from "@/components/landing/AdvantagesSection";
+import { Footer } from "@/components/landing/Footer";
 
 export default function Home() {
-  redirect('/admin');
+  return (
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
+      <Header />
+      <main>
+        <HeroSection />
+        <AdvantagesSection />
+        <ProductsSection />
+      </main>
+      <Footer />
+    </div>
+  );
 }
