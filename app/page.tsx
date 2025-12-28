@@ -5,7 +5,7 @@ import { AdvantagesSection } from "@/components/landing/AdvantagesSection";
 import { QuestionsSection } from "@/components/landing/QuestionsSection";
 import { Footer } from "@/components/landing/Footer";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default function Home() {
   return (

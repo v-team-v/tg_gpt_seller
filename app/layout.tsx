@@ -35,6 +35,23 @@ export default function RootLayout({
           <Analytics />
         </Suspense>
         {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "ChatGPT Plus",
+              "url": "https://chatgpt-plus.ru",
+              "description": "Доступ к ChatGPT-4 и DALL-E 3 без ограничений в России",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://chatgpt-plus.ru/?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
       </body>
     </html>
   );
