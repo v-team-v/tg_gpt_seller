@@ -7,7 +7,7 @@ services:
     container_name: tg_shop_web
     restart: always
     ports:
-      - "3000:3000"
+      - "3000"
     env_file:
       - .env
     environment:
@@ -36,3 +36,21 @@ services:
     # Run the bot using tsx directly from node_modules. 
     # Note: 'server.js' is for Next.js. We need to override command for bot.
     command: npx tsx scripts/start-bot.ts
+
+  # 3. Caddy (Reverse Proxy + SSL)
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  caddy_data:
+  caddy_config:

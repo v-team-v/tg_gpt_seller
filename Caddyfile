@@ -1,0 +1,3 @@
+chatgpt-plus.ru, www.chatgpt-plus.ru {
+    reverse_proxy web:3000
+}
