@@ -5,7 +5,6 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 const prismaClientSingleton = () => {
   return new PrismaClient()
 }
-};
 
 export const prisma = globalForPrisma.prisma || prismaClientSingleton();
 
