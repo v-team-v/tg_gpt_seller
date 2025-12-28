@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Bot } from "lucide-react";
+import { BotLink } from "./BotLink";
 
 export function Header() {
     return (
@@ -18,14 +19,11 @@ export function Header() {
                     <Link href="#faq" className="hover:text-primary transition-colors">Вопросы</Link>
                 </nav>
 
-                <a
-                    href="https://t.me/gpt_sub_bot"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <BotLink
                     className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
                 >
                     Купить подписку
-                </a>
+                </BotLink>
             </div>
         </header>
     );

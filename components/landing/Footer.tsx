@@ -35,13 +35,25 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h4 className="font-bold mb-4">Реквизиты</h4>
+                        <h4 className="font-bold mb-4">Контакты</h4>
                         <ul className="space-y-3 text-sm text-muted-foreground">
-                            <li>ИП Киселев Владимир Ильич</li>
-                            <li>ИНН: 525718619554</li>
-                            <li>ОГРНИП: 325527500093012</li>
-                            <li>Юридический адрес: г. Нижний Новгород, 603107, пр-кт Гагарина д.99 к2</li>
+                            <li>
+                                <BotLink className="flex items-center gap-2 hover:text-foreground transition-colors">
+                                    <Send size={16} /> gpt_sub_bot
+                                </BotLink>
+                            </li>
                         </ul>
+                    </div>
+                </div>
+
+                {/* Requisites - Compact View */}
+                <div className="border-t border-border py-8 text-xs text-muted-foreground/60">
+                    <p className="font-semibold mb-2">Реквизиты:</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <p>ИП Киселев Владимир Ильич</p>
+                        <p>ИНН: 525718619554</p>
+                        <p>ОГРНИП: 325527500093012</p>
+                        <p>Юридический адрес: г. Нижний Новгород, 603107, пр-кт Гагарина д.99 к2</p>
                     </div>
                 </div>
 
