@@ -9,10 +9,13 @@ export function HeroSection() {
             {/* <div className="absolute bottom-0 right-0 w-[400px] h-[300px] bg-secondary/20 blur-[50px] rounded-full pointer-events-none" /> */}
 
             <div className="container mx-auto px-4 relative z-10 text-center">
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-                    Поможем с оплатой ChatGPT Plus в России <br />
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                    Поможем с оплатой <br />
+                    ChatGPT Plus в России <br />
                     <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
-                        Продлим подписку или активируем новый аккаунт
+                        Продлим подписку или <br />
+                        активируем новый <br />
+                        аккаунт
                     </span>
                 </h1>
 

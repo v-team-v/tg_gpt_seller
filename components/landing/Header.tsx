@@ -17,6 +17,7 @@ export function Header() {
                     <Link href="#features" className="hover:text-primary transition-colors">Преимущества</Link>
                     <Link href="#pricing" className="hover:text-primary transition-colors">Тарифы</Link>
                     <Link href="#faq" className="hover:text-primary transition-colors">Вопросы</Link>
+                    <BotLink className="hover:text-primary transition-colors">Контакты</BotLink>
                 </nav>
 
                 <BotLink
