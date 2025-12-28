@@ -12,8 +12,28 @@ const PASSWORD_2 = process.env.ROBOKASSA_PASS2 || '';
 const IS_TEST = false; // User said shop is active
 
 export function generatePaymentUrl({ amount, orderId, description }: PaymentParams): string {
-    // Signature: md5(MerchantLogin:OutSum:InvId:Password#1)
-    const signatureString = `${MERCHANT_LOGIN}:${amount}:${orderId}:${PASSWORD_1}`;
+    // Receipt Object
+    const receipt = JSON.stringify({
+        sno: "usn_income",
+        items: [
+            {
+                name: "Оформление подписки для ChatGPT",
+                quantity: 1,
+                sum: amount,
+                price: amount,
+                tax: "none",
+                payment_method: "full_prepayment",
+                payment_object: "service"
+            }
+        ]
+    });
+
+    // Encode Receipt using URLSearchParams to ensure it matches exactly what goes into the URL
+    // (URLSearchParams uses '+' for spaces, while encodeURIComponent uses '%20')
+    const receiptEncoded = new URLSearchParams({ Receipt: receipt }).get('Receipt') || '';
+
+    // Signature: md5(MerchantLogin:OutSum:InvId:Receipt:Password#1)
+    const signatureString = `${MERCHANT_LOGIN}:${amount}:${orderId}:${receiptEncoded}:${PASSWORD_1}`;
     const signature = crypto.createHash('md5').update(signatureString).digest('hex');
 
     const params = new URLSearchParams({
@@ -24,8 +44,8 @@ export function generatePaymentUrl({ amount, orderId, description }: PaymentPara
         SignatureValue: signature,
         // Optional: Culture, Email, etc.
         Culture: 'ru',
+        Receipt: receipt
     });
-
     if (IS_TEST) {
         params.append('IsTest', '1');
     }
