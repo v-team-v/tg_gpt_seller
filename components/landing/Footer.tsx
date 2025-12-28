@@ -24,7 +24,7 @@ export function Footer() {
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li><Link href="#features" className="hover:text-foreground transition-colors">Преимущества</Link></li>
                             <li><Link href="#pricing" className="hover:text-foreground transition-colors">Тарифы</Link></li>
-                            <li><Link href="/admin" className="hover:text-foreground transition-colors">Вход для админа</Link></li>
+                            <li><Link href="/admin" prefetch={false} className="hover:text-foreground transition-colors">Вход для админа</Link></li>
                         </ul>
                     </div>
 
