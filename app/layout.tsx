@@ -47,9 +47,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* <Suspense fallback={null}>
+        <Suspense fallback={null}>
           <Analytics />
-        </Suspense> */}
+        </Suspense>
         {children}
         <script
           type="application/ld+json"
