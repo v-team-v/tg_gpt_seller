@@ -2,15 +2,15 @@ import { MessageCircleQuestion, ArrowRight } from "lucide-react";
 
 export function QuestionsSection() {
     return (
-        <section id="faq" className="py-20 bg-background relative overflow-hidden">
+        <section id="faq" className="py-12 bg-background relative overflow-hidden">
             <div className="container mx-auto px-4 relative z-10">
-                <div className="max-w-4xl mx-auto bg-muted/30 border border-border rounded-3xl p-8 md:p-12 text-center">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
-                        <MessageCircleQuestion size={32} />
+                <div className="max-w-4xl mx-auto bg-muted/30 border border-border rounded-3xl p-6 md:p-8 text-center">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
+                        <MessageCircleQuestion size={24} />
                     </div>
 
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Остались вопросы?</h2>
-                    <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
+                    <h2 className="text-2xl md:text-3xl font-bold mb-3">Остались вопросы?</h2>
+                    <p className="text-base text-muted-foreground mb-6 max-w-xl mx-auto">
                         Если у вас возникли трудности с оплатой или выбором тарифа, напишите нам.
                         Мы на связи и готовы помочь!
                     </p>
