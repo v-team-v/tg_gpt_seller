@@ -4,12 +4,12 @@ import { ArrowRight, Sparkles } from "lucide-react";
 export function HeroSection() {
     return (
         <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
-            {/* Background gradients - optimized for mobile performance */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/20 blur-[60px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-[400px] h-[300px] bg-secondary/20 blur-[50px] rounded-full pointer-events-none" />
+            {/* Background gradients - completely removed for performance */}
+            {/* <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/20 blur-[60px] rounded-full pointer-events-none" /> */}
+            {/* <div className="absolute bottom-0 right-0 w-[400px] h-[300px] bg-secondary/20 blur-[50px] rounded-full pointer-events-none" /> */}
 
             <div className="container mx-auto px-4 relative z-10 text-center">
-                <div className="inline-flex items-center gap-2 bg-muted/50 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium mb-8">
+                <div className="inline-flex items-center gap-2 bg-muted/50 px-4 py-1.5 rounded-full text-sm font-medium mb-8">
                     <Sparkles size={16} className="text-primary" />
                     <span>Доступ ко всем возможностям AI</span>
                 </div>
