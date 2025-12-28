@@ -10,20 +10,15 @@ export function HeroSection() {
 
             <div className="container mx-auto px-4 relative z-10 text-center">
                 <div className="inline-flex items-center gap-2 bg-muted/50 px-4 py-1.5 rounded-full text-sm font-medium mb-8">
-                    <Sparkles size={16} className="text-primary" />
-                    <span>Доступ ко всем возможностям AI</span>
+                    <span>Оплата картами РФ</span>
                 </div>
 
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-                    ChatGPT Plus <br />
-                    <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
-                        без ограничений
-                    </span>
+                    Получите доступ к передовым ИИ моделям OpenAI и анализу данных прямо сейчас.
                 </h1>
 
                 <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-                    Получите доступ к GPT-4o, DALL-E 3 и анализу данных прямо сейчас.
-                    Оплата российскими картами, мгновенная активация.
+                    Оплата российскими картами, быстрая активация.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

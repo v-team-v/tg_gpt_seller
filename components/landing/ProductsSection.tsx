@@ -2,6 +2,36 @@ import { prisma } from "@/lib/prisma";
 import { BotLink } from "./BotLink";
 import { Check } from "lucide-react";
 
+const PRODUCT_DESCRIPTIONS: Record<string, { description: string, features: string[] }> = {
+    "Новый аккаунт ChatGPT Plus 1 месяц": {
+        description: "Мы создадим новый аккаунт ChatGPT и сразу активируем подписку Plus на 1 месяц. Вы получаете полный доступ к аккаунту ChatGPT и привязанной почте.",
+        features: [
+            "Включает подписку ChatGPT Plus на месяц",
+            "Персональный аккаунт - доступ только у вас",
+            "Быстрая доставка - получите аккаунт за считанные минуты",
+            "Оплата через СБП и карты МИР"
+        ]
+    },
+    "Продление подписки ChatGPT Plus": {
+        description: "Продлим подписку на вашем аккаунте. Для активации подписки потребуется логин и пароль для входа в аккаунт (сообщите данные от аккаунта менеджеру).",
+        features: [
+            "Продлевает подписку ChatGPT Plus на месяц",
+            "Сохранение всей истории чатов на вашем аккаунте",
+            "Быстрая активация",
+            "Оплата через СБП и карты МИР"
+        ]
+    },
+    "ChatGPT Business 1 месяц": {
+        description: "Подключим ваш аккаунт ChatGPT к Business тарифу. Активация подписки не требует входа в аккаунт, доступ предоставляется по ссылке-приглашению.",
+        features: [
+            "Подписка ChatGPT Plus на месяц",
+            "Доступ к модели Pro (есть лимиты)",
+            "Быстрая активация",
+            "Оплата через СБП и карты МИР"
+        ]
+    }
+};
+
 export async function ProductsSection() {
     const products = await prisma.product.findMany({
         where: { isActive: true },
@@ -14,7 +44,7 @@ export async function ProductsSection() {
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold mb-4">Тарифы</h2>
                     <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                        Выберите с подписку, которая подходит именно вам.
+                        Выберите подписку, которая подходит именно вам.
                         Мгновенная активация после оплаты.
                     </p>
                 </div>
@@ -30,15 +60,17 @@ export async function ProductsSection() {
                             <div className="mb-6">
                                 <h3 className="text-xl font-bold mb-2">{product.title}</h3>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-4xl font-bold">{product.price} ₽</span>
-                                    <span className="text-muted-foreground">/ мес</span>
+                                    <span className="text-4xl font-bold">{Math.round(product.price)} ₽</span>
                                 </div>
                             </div>
 
                             <div className="flex-grow mb-8">
-                                <ul className="space-y-4">
-                                    {/* Parsing description lines as features */}
-                                    {product.description.split('\n').map((line, i) => (
+                                <p className="text-muted-foreground mb-6 min-h-[80px]">
+                                    {PRODUCT_DESCRIPTIONS[product.title]?.description || product.description}
+                                </p>
+
+                                <ul className="space-y-3">
+                                    {(PRODUCT_DESCRIPTIONS[product.title]?.features || product.description.split('\n')).map((line, i) => (
                                         line.trim() && (
                                             <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
                                                 <Check className="w-5 h-5 text-green-500 shrink-0" />
@@ -46,19 +78,6 @@ export async function ProductsSection() {
                                             </li>
                                         )
                                     ))}
-                                    {/* Default features if description is short */}
-                                    <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                                        <Check className="w-5 h-5 text-green-500 shrink-0" />
-                                        <span>Доступ к GPT-4o</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                                        <Check className="w-5 h-5 text-green-500 shrink-0" />
-                                        <span>Генерация изображений DALL-E 3</span>
-                                    </li>
-                                    <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                                        <Check className="w-5 h-5 text-green-500 shrink-0" />
-                                        <span>Высокая скорость ответа</span>
-                                    </li>
                                 </ul>
                             </div>
 

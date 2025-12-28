@@ -24,8 +24,13 @@ export function Footer() {
                     <div>
                         <h4 className="font-bold mb-4">Навигация</h4>
                         <ul className="space-y-3 text-sm text-muted-foreground">
-                            <li><Link href="#features" className="hover:text-foreground transition-colors">Преимущества</Link></li>
+                            <li><Link href="#features" className="hover:text-foreground transition-colors">Процесс активации</Link></li>
                             <li><Link href="#pricing" className="hover:text-foreground transition-colors">Тарифы</Link></li>
+                            <li>
+                                <BotLink className="hover:text-foreground transition-colors">
+                                    Задать вопрос
+                                </BotLink>
+                            </li>
                         </ul>
                     </div>
 
@@ -37,7 +42,6 @@ export function Footer() {
                                     <Send size={16} /> gpt_sub_bot
                                 </BotLink>
                             </li>
-                            <li>E-mail: support@chatgpt-plus.ru</li>
                         </ul>
                     </div>
                 </div>
@@ -45,8 +49,7 @@ export function Footer() {
                 <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
                     <p>© {new Date().getFullYear()} ChatGPT Plus. Все права защищены.</p>
                     <div className="flex items-center gap-6">
-                        <Link href="/rules" className="hover:text-foreground transition-colors">Пользовательское соглашение</Link>
-                        <Link href="/privacy" className="hover:text-foreground transition-colors">Политика конфиденциальности</Link>
+                        <Link href="/rules" className="hover:text-foreground transition-colors">Пользовательское соглашение (оферта)</Link>
                     </div>
                 </div>
             </div>
