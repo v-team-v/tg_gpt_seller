@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     images: ["/icon.png"],
   },
   other: {
-    "yandex-verification": "no-preview"
+    "yandex-verification": "edd674dd941c7e1e"
   }
 };
 
