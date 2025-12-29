@@ -18,11 +18,13 @@ export async function POST(req: NextRequest) {
         const signature = params.get('SignatureValue');
 
         if (!outSum || !invId || !signature) {
+            console.error('Webhook POST: Missing parameters', { outSum, invId, signature });
             return new NextResponse('Missing parameters', { status: 400 });
         }
 
         const validSignature = validateSignature(outSum, invId, signature);
         if (!validSignature) {
+            console.error('Webhook POST: Bad signature', { outSum, invId, signature });
             return new NextResponse('Bad signature', { status: 400 });
         }
 
@@ -38,6 +40,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (!order) {
+            console.error('Webhook POST: Order not found', internalId);
             return new NextResponse('Order not found', { status: 400 });
         }
 
@@ -48,6 +51,7 @@ export async function POST(req: NextRequest) {
 
         // Verify amount (optional but recommended)
         if (Math.abs(order.amount - parseFloat(outSum)) > 0.01) {
+            console.error('Webhook POST: Amount mismatch', { orderAmount: order.amount, outSum });
             return new NextResponse('Amount mismatch', { status: 400 });
         }
 
@@ -102,10 +106,12 @@ export async function GET(req: NextRequest) {
         const signature = searchParams.get('SignatureValue');
 
         if (!outSum || !invId || !signature) {
+            console.error('Webhook GET: Missing parameters', { outSum, invId, signature });
             return new NextResponse('Missing parameters', { status: 400 });
         }
 
         if (!validateSignature(outSum, invId, signature)) {
+            console.error('Webhook GET: Bad signature', { outSum, invId, signature });
             return new NextResponse('Bad signature', { status: 400 });
         }
 
@@ -118,14 +124,32 @@ export async function GET(req: NextRequest) {
             include: { user: true, product: true }
         });
 
-        if (!order) return new NextResponse('Order not found', { status: 400 });
+        if (!order) {
+            console.error('Webhook GET: Order not found', internalId);
+            return new NextResponse('Order not found', { status: 400 });
+        }
+
         if (order.status === 'PAID' || order.status === 'COMPLETED') return new NextResponse(`OK${invId}`, { status: 200 });
-        if (Math.abs(order.amount - parseFloat(outSum)) > 0.01) return new NextResponse('Amount mismatch', { status: 400 });
+
+        if (Math.abs(order.amount - parseFloat(outSum)) > 0.01) {
+            console.error('Webhook GET: Amount mismatch', { orderAmount: order.amount, outSum });
+            return new NextResponse('Amount mismatch', { status: 400 });
+        }
 
         await prisma.order.update({
             where: { id: internalId },
             data: { status: 'PAID', updatedAt: new Date() }
         });
+
+        // Send Analytics
+        if (order.user.yandexClientId) {
+            const { sendMetricaHit } = await import('@/lib/analytics');
+            await sendMetricaHit({
+                clientId: order.user.yandexClientId,
+                target: 'payment_success',
+                revenue: order.amount
+            });
+        }
 
         try {
             await bot.api.sendMessage(
@@ -140,7 +164,7 @@ export async function GET(req: NextRequest) {
 
         return new NextResponse(`OK${invId}`, { status: 200 });
     } catch (e) {
-        console.error(e);
+        console.error('Webhook GET Error:', e);
         return new NextResponse('Internal Server Error', { status: 500 });
     }
 }
