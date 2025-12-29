@@ -9,7 +9,7 @@ const features = [
     {
         icon: CreditCard,
         title: "2. Оплатите подписку",
-        description: "Оплатить услугу можно как картой РФ так и по QR коду через СБП.",
+        description: "Оплатить услугу можно как картой РФ, так и по QR коду через СБП.",
     },
     {
         icon: Zap,
@@ -18,7 +18,7 @@ const features = [
     },
     {
         icon: Sparkles,
-        title: "4. Наслаждайтесь ChatGPT 5 Plus",
+        title: "4. Наслаждайтесь подпиской ChatGPT Plus",
         description: "Получите полный доступ к ChatGPT Plus на месяц.",
     },
 ];

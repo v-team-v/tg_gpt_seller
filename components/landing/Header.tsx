@@ -14,10 +14,10 @@ export function Header() {
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-                    <Link href="#features" className="hover:text-primary transition-colors">Преимущества</Link>
+                    <Link href="#features" className="hover:text-primary transition-colors">Процесс активации</Link>
                     <Link href="#pricing" className="hover:text-primary transition-colors">Тарифы</Link>
                     <Link href="#faq" className="hover:text-primary transition-colors">Вопросы</Link>
-                    <BotLink className="hover:text-primary transition-colors">Контакты</BotLink>
+
                 </nav>
 
                 <BotLink
