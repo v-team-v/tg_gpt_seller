@@ -221,7 +221,11 @@ bot.callbackQuery(/view_product_(\d+)/, async (ctx) => {
     }
 
     await ctx.answerCallbackQuery();
-    await ctx.deleteMessage(); // Clean up the list to avoid clutter? Or keep it? Usually better to send new msg. 
+    try {
+        await ctx.deleteMessage();
+    } catch (e) {
+        // Ignore delete error (message too old, etc)
+    }
     // User requested "Click on name -> Go to full description". 
     // Let's delete the list or edit it? Getting "back" button is good practice then.
     // For simplicity, let's send a new message.
@@ -266,7 +270,11 @@ bot.callbackQuery(/view_product_(\d+)/, async (ctx) => {
 // Back to Catalog
 bot.callbackQuery("back_to_catalog", async (ctx) => {
     await ctx.answerCallbackQuery();
-    await ctx.deleteMessage();
+    try {
+        await ctx.deleteMessage();
+    } catch (e) {
+        // Ignore
+    }
     // Trigger catalog display logic (reuse code or call logic?)
     // Re-sending catalog:
     const products = await prisma.product.findMany({
@@ -315,7 +323,11 @@ bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
     // Usually invoice is a new distinct step. Let's delete to keep clean? 
     // Requests says "after pressing... show message...".
     // I'll delete the product card to focus on payment.
-    await ctx.deleteMessage();
+    try {
+        await ctx.deleteMessage();
+    } catch (e) {
+        // Ignore
+    }
 
     // Obfuscate Order ID
     const publicOrderId = 27654423 + order.id;

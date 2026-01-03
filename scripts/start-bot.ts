@@ -15,6 +15,10 @@ async function main() {
 }
 
 main().catch((err) => {
-    console.error("Fatal Bot Error:", err);
+    if (err instanceof Object && 'error_code' in err && err.error_code === 409) {
+        console.error("Conflict: Another bot instance is running. Please stop it first.");
+    } else {
+        console.error("Fatal Bot Error:", err);
+    }
     process.exit(1);
 });
