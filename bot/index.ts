@@ -1,7 +1,9 @@
 import { Bot, session, Context, SessionFlavor, InlineKeyboard, Keyboard } from 'grammy';
 import { prisma } from '../lib/prisma';
 
-interface SessionData { }
+interface SessionData {
+    step?: 'WAITING_FOR_PROMO';
+}
 type MyContext = Context & SessionFlavor<SessionData>;
 
 
@@ -49,6 +51,7 @@ export async function initBot() {
 const getMainMenu = () => {
     return new Keyboard()
         .text("ChatGPT Plus").row()
+        .text("Промокод").row()
         .text("Как происходит активация").text("Профиль").row()
         .text("Поддержка").resized();
 };
@@ -124,8 +127,17 @@ bot.command('start', async (ctx) => {
     }
 });
 
-// 1. ChatGPT Plus (Catalog Category)
 bot.hears("ChatGPT Plus", async (ctx) => {
+    if (!ctx.from) return;
+    const userId = ctx.from.id.toString();
+
+    // Check for active promo
+    const dbUser = await prisma.user.findUnique({
+        where: { telegramId: userId },
+        include: { activatedPromoCodes: true }
+    });
+    const activePromo = dbUser?.activatedPromoCodes.find(p => !p.isUsed);
+
     const products = await prisma.product.findMany({
         where: { isActive: true },
         orderBy: { sortOrder: 'asc' }
@@ -138,7 +150,12 @@ bot.hears("ChatGPT Plus", async (ctx) => {
 
     const keyboard = new InlineKeyboard();
     products.forEach(p => {
-        keyboard.text(`${p.title} - ${p.price} ₽`, `view_product_${p.id}`).row();
+        let label = `${p.title} - ${p.price} ₽`;
+        if (activePromo) {
+            const discounted = Math.max(0, p.price - activePromo.discountAmount);
+            label = `${p.title} - ${discounted} ₽ (было ${p.price})`;
+        }
+        keyboard.text(label, `view_product_${p.id}`).row();
     });
 
     await ctx.reply("Выберите тариф:", { reply_markup: keyboard });
@@ -208,41 +225,100 @@ bot.hears("Поддержка", async (ctx) => {
 });
 
 
+// 5. Promo Code Section
+bot.hears("Промокод", async (ctx) => {
+    const user = ctx.from;
+
+    // Check for active promo
+    const dbUser = await prisma.user.findUnique({
+        where: { telegramId: user?.id.toString() },
+        include: { activatedPromoCodes: true }
+    });
+
+    // We assume user can have only one active promo code at a time or we take the first one
+    const activePromo = dbUser?.activatedPromoCodes.find(p => !p.isUsed);
+
+    if (activePromo) {
+        const text = `🎟 <b>Ваш промокод:</b> <code>${activePromo.code}</code>\n` +
+            `Скидка: <b>${activePromo.discountAmount} ₽</b>\n` +
+            `Статус: ✅ Активирован (зарезервирован за вами)\n\n` +
+            `Скидка автоматически применится при выборе товара.`;
+
+        const keyboard = new InlineKeyboard()
+            .text("❌ Отменить промокод", `cancel_promo_${activePromo.id}`);
+
+        await ctx.reply(text, { parse_mode: "HTML", reply_markup: keyboard });
+    } else {
+        const text = "У вас нет активного промокода.";
+        const keyboard = new InlineKeyboard()
+            .text("✍️ Ввести промокод", "enter_promo");
+
+        await ctx.reply(text, { reply_markup: keyboard });
+    }
+});
+
+bot.callbackQuery("enter_promo", async (ctx) => {
+    ctx.session.step = "WAITING_FOR_PROMO";
+    await ctx.answerCallbackQuery();
+    await ctx.reply("Пожалуйста, введите код купона:");
+});
+
+bot.callbackQuery(/cancel_promo_(\d+)/, async (ctx) => {
+    const promoId = parseInt(ctx.match[1]);
+
+    // Unlink from user
+    await prisma.promoCode.update({
+        where: { id: promoId },
+        data: { activatedByUserId: null }
+    });
+
+    await ctx.answerCallbackQuery("Промокод отменен");
+    await ctx.reply("Промокод успешно отменен. Теперь вы можете ввести другой.");
+});
+
 // --- Inline Query Handlers ---
 
 // View Product Detail
 bot.callbackQuery(/view_product_(\d+)/, async (ctx) => {
     const productId = parseInt(ctx.match[1]);
-    const product = await prisma.product.findUnique({ where: { id: productId } });
+    const userId = ctx.from.id.toString();
 
+    const product = await prisma.product.findUnique({ where: { id: productId } });
     if (!product) {
         await ctx.answerCallbackQuery("Товар не найден");
         return;
     }
 
+    // Check for active promo
+    const dbUser = await prisma.user.findUnique({
+        where: { telegramId: userId },
+        include: { activatedPromoCodes: true }
+    });
+    const activePromo = dbUser?.activatedPromoCodes.find(p => !p.isUsed);
+
+    let priceDisplay = `<b>${product.price} ₽</b>`;
+    let finalPrice = product.price;
+
+    if (activePromo) {
+        finalPrice = Math.max(0, product.price - activePromo.discountAmount);
+        priceDisplay = `<s>${product.price} ₽</s> <b>${finalPrice} ₽</b> 🔥 (Скидка ${activePromo.discountAmount}₽)`;
+    }
+
     await ctx.answerCallbackQuery();
     try {
         await ctx.deleteMessage();
-    } catch (e) {
-        // Ignore delete error (message too old, etc)
-    }
-    // User requested "Click on name -> Go to full description". 
-    // Let's delete the list or edit it? Getting "back" button is good practice then.
-    // For simplicity, let's send a new message.
+    } catch (e) { }
 
-    // Updated Buttons: "Select this product" and "Back"
     const keyboard = new InlineKeyboard()
         .text("Выбрать этот товар", `create_order_${product.id}`).row()
         .text("Назад", "back_to_catalog");
 
-    const caption = `<b>${product.title}</b>\n\n${product.description}\n\nЦена: <b>${product.price} ₽</b>`;
+    const caption = `<b>${product.title}</b>\n\n${product.description}\n\nЦена: ${priceDisplay}`;
 
     if (product.imageUrl) {
-        // Handle local file uploads
         const fs = require('fs');
         const path = require('path');
         const { InputFile } = require('grammy');
-
         const absolutePath = path.join(process.cwd(), 'public', product.imageUrl);
 
         if (fs.existsSync(absolutePath)) {
@@ -269,21 +345,30 @@ bot.callbackQuery(/view_product_(\d+)/, async (ctx) => {
 
 // Back to Catalog
 bot.callbackQuery("back_to_catalog", async (ctx) => {
+    // Reuse catalog logic but updated with Prices
+    const userId = ctx.from.id.toString();
+    const dbUser = await prisma.user.findUnique({
+        where: { telegramId: userId },
+        include: { activatedPromoCodes: true }
+    });
+    const activePromo = dbUser?.activatedPromoCodes.find(p => !p.isUsed);
+
     await ctx.answerCallbackQuery();
-    try {
-        await ctx.deleteMessage();
-    } catch (e) {
-        // Ignore
-    }
-    // Trigger catalog display logic (reuse code or call logic?)
-    // Re-sending catalog:
+    try { await ctx.deleteMessage(); } catch (e) { }
+
     const products = await prisma.product.findMany({
         where: { isActive: true },
         orderBy: { sortOrder: 'asc' }
     });
+
     const keyboard = new InlineKeyboard();
     products.forEach(p => {
-        keyboard.text(`${p.title} - ${p.price} ₽`, `view_product_${p.id}`).row();
+        let label = `${p.title} - ${p.price} ₽`;
+        if (activePromo) {
+            const discounted = Math.max(0, p.price - activePromo.discountAmount);
+            label = `${p.title} - ${discounted} ₽ (было ${p.price})`;
+        }
+        keyboard.text(label, `view_product_${p.id}`).row();
     });
     await ctx.reply("Выберите тариф:", { reply_markup: keyboard });
 });
@@ -300,12 +385,23 @@ bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
         return;
     }
 
-    // Find DB User
-    const dbUser = await prisma.user.findUnique({ where: { telegramId: userId } });
+    const dbUser = await prisma.user.findUnique({
+        where: { telegramId: userId },
+        include: { activatedPromoCodes: true }
+    });
     if (!dbUser) {
-        // Should exist from /start, but separate checks are good.
-        await ctx.answerCallbackQuery("Пользователь не найден. Введите /start");
+        await ctx.answerCallbackQuery("Пользователь не найден");
         return;
+    }
+
+    // Apply Promo
+    const activePromo = dbUser.activatedPromoCodes.find(p => !p.isUsed);
+    let finalAmount = product.price;
+    let promoCodeId = undefined;
+
+    if (activePromo) {
+        finalAmount = Math.max(0, product.price - activePromo.discountAmount);
+        promoCodeId = activePromo.id;
     }
 
     // Create Order
@@ -313,34 +409,29 @@ bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
         data: {
             userId: dbUser.id,
             productId: product.id,
-            amount: product.price,
-            status: "PENDING"
+            amount: finalAmount,
+            status: "PENDING",
+            promoCodeId: promoCodeId
         }
     });
 
     await ctx.answerCallbackQuery();
-    // await ctx.deleteMessage(); // Optional: remove product card? Or keep history. 
-    // Usually invoice is a new distinct step. Let's delete to keep clean? 
-    // Requests says "after pressing... show message...".
-    // I'll delete the product card to focus on payment.
-    try {
-        await ctx.deleteMessage();
-    } catch (e) {
-        // Ignore
-    }
+    try { await ctx.deleteMessage(); } catch (e) { }
 
-    // Obfuscate Order ID
     const publicOrderId = 27654423 + order.id;
-
-    // Formatting date time for "actuality"
     const now = new Date();
-    const until = new Date(now.getTime() + 15 * 60000); // +15 mins
+    const until = new Date(now.getTime() + 15 * 60000);
     const timeString = until.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+
+    let priceLine = `<b>Цена:</b> ${product.price} ₽`;
+    if (activePromo) {
+        priceLine = `<b>Цена:</b> <s>${product.price} ₽</s> <b>${finalAmount} ₽</b> (Промокод ${activePromo.code})`;
+    }
 
     const text =
         `➖➖➖➖➖➖➖➖➖➖➖
 <b>Товар:</b> ${product.title}
-<b>Цена:</b> ${product.price} ₽
+${priceLine}
 <b>Заказ:</b> ${publicOrderId}
 ➖➖➖➖➖➖➖➖➖➖➖
 Для оплаты перейдите по ссылке!
@@ -348,22 +439,27 @@ bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
 Необходимо оплатить до ${timeString}
 ➖➖➖➖➖➖➖➖➖➖➖`;
 
-    // Payment Button
     const { generatePaymentUrl } = require('../lib/robokassa');
     const paymentUrl = generatePaymentUrl({
-        amount: product.price,
-        orderId: publicOrderId, // Use Public ID for Robokassa
+        amount: finalAmount,
+        orderId: publicOrderId,
         description: `Оплата заказа #${publicOrderId} (ChatGPT Plus)`
     });
 
     const keyboard = new InlineKeyboard()
-        .url(`Оплатить ${product.price} ₽`, paymentUrl);
+        .url(`Оплатить ${finalAmount} ₽`, paymentUrl);
 
     await ctx.reply(text, { parse_mode: "HTML", reply_markup: keyboard });
 });
 
-// History Handler
+// ... History Handler ... (unchanged part skipped for brevity, will keep using previous block if not replacing whole)
+// Actually I need to be careful with replace_file_content.
+// I replaced `// --- Inline Query Handlers ---` down to end.
+// I should make sure History and other handlers are preserved or re-added.
+
+// Re-adding History Handler and others
 bot.callbackQuery("history", async (ctx) => {
+    // ... same as before
     const userId = ctx.from.id.toString();
     const dbUser = await prisma.user.findUnique({
         where: { telegramId: userId },
@@ -383,7 +479,6 @@ bot.callbackQuery("history", async (ctx) => {
 
     let text = "📦 <b>История последних заказов:</b>\n\n";
 
-    // Status Translation
     const statusMap: Record<string, string> = {
         'PENDING': '⏳ Ожидает оплаты',
         'PAID': '✅ Оплачен',
@@ -415,7 +510,72 @@ bot.callbackQuery("history", async (ctx) => {
 
 bot.on('message:text', async (ctx) => {
     const text = ctx.message.text;
-    const menuCommands = ["ChatGPT Plus", "Как происходит активация", "Профиль", "Поддержка"];
+    const menuCommands = ["ChatGPT Plus", "Промокод", "Как происходит активация", "Профиль", "Поддержка"];
+
+    // Handle Promo Input
+    if (ctx.session.step === 'WAITING_FOR_PROMO') {
+        // Reset step
+        ctx.session.step = undefined;
+
+        if (menuCommands.includes(text)) {
+            // Can pass through to normal handler?
+            // Or just return and let user click again?
+            // Better to process menu click
+        } else {
+            // Look up promo
+            const promo = await prisma.promoCode.findUnique({
+                where: { code: text.trim() }
+            });
+
+            if (!promo) {
+                await ctx.reply("❌ Промокод не найден.");
+                return;
+            }
+
+            if (promo.isUsed) {
+                await ctx.reply("❌ Этот промокод уже был использован.");
+                return;
+            }
+
+            if (promo.activatedByUserId) {
+                // Check if it's me
+                const user = await prisma.user.findUnique({ where: { telegramId: ctx.from.id.toString() } });
+                if (promo.activatedByUserId === user?.id) {
+                    await ctx.reply("✅ Вы уже активировали этот промокод!");
+                } else {
+                    await ctx.reply("❌ Этот промокод уже активирован другим пользователем.");
+                }
+                return;
+            }
+
+            // Reserve it
+            const user = await prisma.user.findUnique({ where: { telegramId: ctx.from.id.toString() } });
+            if (!user) return; // Should not happen
+
+            // Check if user already has active promo? 
+            // We can overwrite or prevent? 
+            // Let's overwrite (cancel previous implicitely) or just forbid?
+            // Prompt said "Active promo...". If I enter new one, I probably want to switch.
+            // But strict DB relation might prevent? No 1-to-many.
+            // But we want to release old one.
+
+            // Release old promos
+            await prisma.promoCode.updateMany({
+                where: { activatedByUserId: user.id },
+                data: { activatedByUserId: null }
+            });
+
+            // Activate new
+            await prisma.promoCode.update({
+                where: { id: promo.id },
+                data: { activatedByUserId: user.id }
+            });
+
+            await ctx.reply(`✅ Промокод <b>${promo.code}</b> успешно активирован!\nСкидка <b>${promo.discountAmount} ₽</b> будет применена к следующему заказу.`, { parse_mode: "HTML" });
+            return;
+        }
+    }
+
     if (menuCommands.includes(text)) return;
 
     // Auto-reply for unknown text

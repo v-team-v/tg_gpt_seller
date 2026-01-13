@@ -1,8 +1,9 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { prisma } from '@/lib/prisma';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+
 import { Search } from './search';
+import { DateFilter } from '../components/date-filter';
 
 type OrderWithRelations = {
     id: number;
@@ -25,10 +26,12 @@ export const dynamic = 'force-dynamic';
 export default async function OrdersPage(props: {
     searchParams: Promise<{
         q?: string;
+        date?: string;
     }>;
 }) {
     const searchParams = await props.searchParams;
-    const query = searchParams?.q || '';
+    const query = searchParams?.q || undefined;
+    const dateFilter = searchParams?.date || undefined;
 
     let whereClause: any = {};
 
@@ -65,6 +68,25 @@ export default async function OrdersPage(props: {
         }
     }
 
+    if (dateFilter) {
+        const start = new Date(dateFilter);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(dateFilter);
+        end.setHours(23, 59, 59, 999);
+
+        // Merge with existing whereClause if needed (though search usually overrides or combines?)
+        // Currently search logic sets whereClause = ... replacing it. 
+        // We need to merge them.
+        whereClause = {
+            ...whereClause,
+            createdAt: {
+                gte: start,
+                lte: end
+            }
+        };
+    }
+
     const orders = await prisma.order.findMany({
         where: whereClause,
         include: {
@@ -82,6 +104,7 @@ export default async function OrdersPage(props: {
 
             <div className="flex items-center space-x-2">
                 <Search placeholder="Поиск по номеру заказа..." />
+                <DateFilter />
             </div>
 
             <div className="rounded-md border bg-white p-4 shadow-sm">
@@ -116,7 +139,16 @@ export default async function OrdersPage(props: {
                                     {order.status === 'COMPLETED' && <Badge variant="secondary">Выдан</Badge>}
                                     {order.status === 'CANCELED' && <Badge variant="destructive">Не оплачен</Badge>}
                                 </TableCell>
-                                <TableCell>{format(order.createdAt, 'dd.MM.yyyy HH:mm')}</TableCell>
+                                <TableCell>
+                                    {new Date(order.createdAt).toLocaleString('ru-RU', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        timeZone: 'Europe/Moscow'
+                                    })}
+                                </TableCell>
                             </TableRow>
                         ))}
 

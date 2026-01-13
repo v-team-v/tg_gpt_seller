@@ -12,24 +12,28 @@ import { Badge } from '@/components/ui/badge';
 import { Search } from '../orders/search'; // Reusing from orders
 import Link from 'next/link';
 
+import { DateFilter } from '../components/date-filter';
+
 export const dynamic = 'force-dynamic';
 
 export default async function UsersPage(props: {
     searchParams?: Promise<{
         q?: string;
         source?: string;
+        date?: string;
     }>;
 }) {
     const searchParams = await props.searchParams;
     const query = searchParams?.q || '';
     const sourceFilter = searchParams?.source || '';
+    const dateFilter = searchParams?.date || undefined;
 
     // Build where clause
     const where: any = {};
 
     if (query) {
         where.OR = [
-            { username: { contains: query } }, // Case sensitive in SQLite usually, but prisma might handle? we'll see
+            { username: { contains: query } },
             { firstName: { contains: query } },
             { telegramId: { contains: query } },
         ];
@@ -37,6 +41,19 @@ export default async function UsersPage(props: {
 
     if (sourceFilter) {
         where.source = { contains: sourceFilter };
+    }
+
+    if (dateFilter) {
+        const start = new Date(dateFilter);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(dateFilter);
+        end.setHours(23, 59, 59, 999);
+
+        where.createdAt = {
+            gte: start,
+            lte: end
+        };
     }
 
     const users = await prisma.user.findMany({
@@ -56,12 +73,13 @@ export default async function UsersPage(props: {
                 <h1 className="text-2xl font-bold tracking-tight">Пользователи</h1>
             </div>
 
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-center flex-wrap">
                 <Search placeholder="Поиск по ID, имени, username..." />
                 <Search placeholder="Фильтр по источнику..." queryKey="source" />
+                <DateFilter />
 
                 {/* Clear Filters */}
-                {(query || sourceFilter) && (
+                {(query || sourceFilter || dateFilter) && (
                     <Link href="/admin/users">
                         <Badge variant="outline" className="cursor-pointer hover:bg-slate-100">
                             Сбросить
@@ -115,7 +133,14 @@ export default async function UsersPage(props: {
                                         )}
                                     </TableCell>
                                     <TableCell className="text-gray-500 text-sm">
-                                        {new Date(user.createdAt).toLocaleDateString('ru-RU')}
+                                        {new Date(user.createdAt).toLocaleString('ru-RU', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            timeZone: 'Europe/Moscow'
+                                        })}
                                     </TableCell>
                                 </TableRow>
                             ))}

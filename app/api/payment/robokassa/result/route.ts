@@ -64,6 +64,17 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        // Mark promo code as used if applicable
+        if (order.promoCodeId) {
+            await prisma.promoCode.update({
+                where: { id: order.promoCodeId },
+                data: {
+                    isUsed: true,
+                    usedByUserId: order.userId
+                }
+            });
+        }
+
         // Send Analytics
         if (order.user.yandexClientId) {
             const { sendMetricaHit } = await import('@/lib/analytics');
@@ -140,6 +151,17 @@ export async function GET(req: NextRequest) {
             where: { id: internalId },
             data: { status: 'PAID', updatedAt: new Date() }
         });
+
+        // Mark promo code as used if applicable
+        if (order.promoCodeId) {
+            await prisma.promoCode.update({
+                where: { id: order.promoCodeId },
+                data: {
+                    isUsed: true,
+                    usedByUserId: order.userId
+                }
+            });
+        }
 
         // Send Analytics
         if (order.user.yandexClientId) {

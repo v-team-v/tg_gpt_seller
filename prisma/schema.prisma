@@ -20,6 +20,8 @@ model User {
   yandexClientId String?
   createdAt   DateTime @default(now())
   orders      Order[]
+  activatedPromoCodes PromoCode[] @relation("PromoActivation")
+  usedPromoCodes      PromoCode[] @relation("PromoUsage")
 }
 
 model Product {
@@ -47,11 +49,31 @@ model Order {
   yookassaId    String?  // Payment ID from Yookassa
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  promoCodeId   Int?
+  promoCode     PromoCode? @relation(fields: [promoCodeId], references: [id])
 }
 
+// ... (previous content)
 model Settings {
   id             Int     @id @default(autoincrement())
   key            String  @unique // e.g., "manual_mode", "offline_message"
   value          String?
   description    String?
+}
+
+model PromoCode {
+  id              Int      @id @default(autoincrement())
+  code            String   @unique
+  discountAmount  Float
+  comment         String?
+  isUsed          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  activatedByUserId Int?
+  activatedBy       User?   @relation("PromoActivation", fields: [activatedByUserId], references: [id])
+
+  usedByUserId      Int?
+  usedBy            User?   @relation("PromoUsage", fields: [usedByUserId], references: [id])
+
+  orders            Order[]
 }

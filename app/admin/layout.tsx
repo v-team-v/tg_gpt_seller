@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Home, Package, ShoppingCart, Settings, Users } from 'lucide-react';
+import { Home, Package, ShoppingCart, Settings, Users, Ticket } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -22,6 +22,7 @@ export default function AdminLayout({
                         <NavItem href="/admin/products" icon={<Package className="h-4 w-4" />} label="Товары" />
                         <NavItem href="/admin/orders" icon={<ShoppingCart className="h-4 w-4" />} label="Заказы" />
                         <NavItem href="/admin/users" icon={<Users className="h-4 w-4" />} label="Пользователи" />
+                        <NavItem href="/admin/promocodes" icon={<Ticket className="h-4 w-4" />} label="Промокоды" />
                         <NavItem href="/admin/settings" icon={<Settings className="h-4 w-4" />} label="Настройки" />
                     </nav>
                 </div>
