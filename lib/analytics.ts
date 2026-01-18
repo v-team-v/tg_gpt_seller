@@ -5,9 +5,11 @@ interface MetricaParams {
     clientId: string;
     target: string;
     revenue?: number;
+    category?: string;
+    label?: string;
 }
 
-export async function sendMetricaHit({ clientId, target, revenue }: MetricaParams) {
+export async function sendMetricaHit({ clientId, target, revenue, category = 'engagement', label = 'server_side' }: MetricaParams) {
     if (!clientId) return;
 
     try {
@@ -19,14 +21,14 @@ export async function sendMetricaHit({ clientId, target, revenue }: MetricaParam
             'ms': MP_TOKEN,                // Token
             'cid': clientId,               // Client ID
             't': 'event',                  // Hit Type
-            'ec': 'payment',               // Event Category
+            'ec': category,                // Event Category
             'ea': target,                  // Event Action (Goal)
-            'el': 'server_side',           // Event Label
-            'dl': 'https://chatgpt-plus.ru/payment-success', // Page URL (Important for attribution)
+            'el': label,                   // Event Label
+            'dl': 'https://chatgpt-plus.ru/bot-action', // Virtual Page URL
             'cu': 'RUB',                   // Currency
         });
 
-        if (revenue) {
+        if (revenue !== undefined && revenue !== null) {
             // 1. Goal Value (For "Goals" report)
             params.append('ev', revenue.toString());
 
@@ -48,15 +50,19 @@ export async function sendMetricaHit({ clientId, target, revenue }: MetricaParam
 
         console.log(`[Analytics] Sending Payload: ${params.toString()}`);
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 seconds timeout
+
         await fetch(url, {
             method: 'POST',
             body: params,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
-        });
+            },
+            signal: controller.signal
+        }).finally(() => clearTimeout(timeoutId));
 
-        console.log(`[Analytics] Sent MP event '${target}' for client '${clientId}' w/ revenue ${revenue}`);
+        console.log(`[Analytics] Sent MP event '${target}' for client '${clientId}' ${revenue ? `w/ revenue ${revenue}` : ''}`);
     } catch (e) {
         console.error('[Analytics] Failed to send metrica hit:', e);
     }

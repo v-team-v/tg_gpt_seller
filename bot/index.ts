@@ -1,4 +1,6 @@
+// 6. Analytics
 import { Bot, session, Context, SessionFlavor, InlineKeyboard, Keyboard } from 'grammy';
+import { sendMetricaHit } from '../lib/analytics';
 import { prisma } from '../lib/prisma';
 
 interface SessionData {
@@ -93,6 +95,13 @@ bot.command('start', async (ctx) => {
 
     const settings = await prisma.settings.findMany();
     const getVal = (key: string) => settings.find(s => s.key === key)?.value;
+
+    // Analytics: hit bot_start
+    await sendMetricaHit({
+        clientId: yandexClientId || user.id.toString(),
+        target: 'bot_start',
+        label: source || 'direct'
+    });
 
     const welcomeMsg = getVal('welcome_message') || `Привет, ${user.first_name}! 👋\nДобро пожаловать в магазин ChatGPT Plus.`;
     const welcomeImg = getVal('welcome_image');
@@ -313,6 +322,14 @@ bot.callbackQuery(/view_product_(\d+)/, async (ctx) => {
         .text("Выбрать этот товар", `create_order_${product.id}`).row()
         .text("Назад", "back_to_catalog");
 
+    // Analytics: view_product
+    const viewingUser = await prisma.user.findUnique({ where: { telegramId: userId } });
+    await sendMetricaHit({
+        clientId: viewingUser?.yandexClientId || userId,
+        target: 'view_product',
+        label: product.title // Or ID
+    });
+
     const caption = `<b>${product.title}</b>\n\n${product.description}\n\nЦена: ${priceDisplay}`;
 
     if (product.imageUrl) {
@@ -413,6 +430,13 @@ bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
             status: "PENDING",
             promoCodeId: promoCodeId
         }
+    });
+
+    // Analytics: begin_checkout
+    await sendMetricaHit({
+        clientId: dbUser.yandexClientId || userId,
+        target: 'begin_checkout',
+        label: product.title
     });
 
     await ctx.answerCallbackQuery();

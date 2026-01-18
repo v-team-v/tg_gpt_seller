@@ -80,8 +80,7 @@ export async function POST(req: NextRequest) {
             const { sendMetricaHit } = await import('@/lib/analytics');
             await sendMetricaHit({
                 clientId: order.user.yandexClientId,
-                target: 'payment_success',
-                revenue: order.amount
+                target: 'payment_success'
             });
         }
 
@@ -168,8 +167,7 @@ export async function GET(req: NextRequest) {
             const { sendMetricaHit } = await import('@/lib/analytics');
             await sendMetricaHit({
                 clientId: order.user.yandexClientId,
-                target: 'payment_success',
-                revenue: order.amount
+                target: 'payment_success'
             });
         }
 
