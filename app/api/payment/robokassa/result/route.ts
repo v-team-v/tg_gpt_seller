@@ -76,13 +76,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Send Analytics
-        if (order.user.yandexClientId) {
-            const { sendMetricaHit } = await import('@/lib/analytics');
-            await sendMetricaHit({
-                clientId: order.user.yandexClientId,
-                target: 'payment_success'
-            });
-        }
+
 
         // Notify User
         try {
@@ -163,13 +157,7 @@ export async function GET(req: NextRequest) {
         }
 
         // Send Analytics
-        if (order.user.yandexClientId) {
-            const { sendMetricaHit } = await import('@/lib/analytics');
-            await sendMetricaHit({
-                clientId: order.user.yandexClientId,
-                target: 'payment_success'
-            });
-        }
+
 
         try {
             await bot.api.sendMessage(

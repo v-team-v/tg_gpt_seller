@@ -4,19 +4,23 @@ import { Badge } from '@/components/ui/badge';
 
 import { Search } from './search';
 import { DateFilter } from '../components/date-filter';
+import { ManualRevenueControl } from './manual-revenue';
 
 type OrderWithRelations = {
     id: number;
     amount: number;
     status: string;
     createdAt: Date;
+    product: {
+        title: string;
+    };
+    isRevenueSent: boolean;
+    sentRevenueAmount: number | null;
     user: {
         username: string | null;
         firstName: string | null;
         lastName: string | null;
-    };
-    product: {
-        title: string;
+        yandexClientId: string | null;
     };
 };
 
@@ -116,6 +120,7 @@ export default async function OrdersPage(props: {
                             <TableHead>Пользователь</TableHead>
                             <TableHead>Товар</TableHead>
                             <TableHead>Сумма</TableHead>
+                            <TableHead>Revenue</TableHead>
                             <TableHead>Статус</TableHead>
                             <TableHead>Дата</TableHead>
                         </TableRow>
@@ -133,6 +138,14 @@ export default async function OrdersPage(props: {
                                 </TableCell>
                                 <TableCell>{order.product.title}</TableCell>
                                 <TableCell>{order.amount} ₽</TableCell>
+                                <TableCell>
+                                    <ManualRevenueControl
+                                        orderId={order.id}
+                                        initialIsSent={order.isRevenueSent}
+                                        initialAmount={order.sentRevenueAmount}
+                                        hasClientId={!!order.user.yandexClientId}
+                                    />
+                                </TableCell>
                                 <TableCell>
                                     {order.status === 'PAID' && <Badge className="bg-green-600">Оплачен</Badge>}
                                     {order.status === 'PENDING' && <Badge variant="outline">Ожидает</Badge>}
@@ -154,7 +167,7 @@ export default async function OrdersPage(props: {
 
                         {orders.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                                <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
                                     Заказов пока нет.
                                 </TableCell>
                             </TableRow>
