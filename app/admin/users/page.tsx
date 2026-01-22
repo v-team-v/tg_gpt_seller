@@ -22,6 +22,7 @@ export default async function UsersPage(props: {
         q?: string;
         source?: string;
         date?: string;
+        page?: string;
     }>;
 }) {
     const searchParams = await props.searchParams;
@@ -44,18 +45,37 @@ export default async function UsersPage(props: {
     if (sourceFilter) {
         where.source = { contains: sourceFilter };
     }
-    // ... (lines 46-57 unchanged)
+    if (dateFilter) {
+        const start = new Date(dateFilter);
+        start.setHours(0, 0, 0, 0);
 
-    const users = await prisma.user.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        include: {
-            _count: {
-                select: { orders: true }
-            }
-        },
-        take: 100,
-    });
+        const end = new Date(dateFilter);
+        end.setHours(23, 59, 59, 999);
+
+        where.createdAt = {
+            gte: start,
+            lte: end
+        };
+    }
+
+    const page = Number(searchParams?.page) || 1;
+    const PAGE_SIZE = 50;
+    const skip = (page - 1) * PAGE_SIZE;
+
+    const [users, totalCount] = await Promise.all([
+        prisma.user.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+            include: {
+                _count: {
+                    select: { orders: true }
+                }
+            },
+            take: PAGE_SIZE,
+            skip: skip,
+        }),
+        prisma.user.count({ where })
+    ]);
 
     return (
         <div className="flex flex-col gap-6">
@@ -151,6 +171,7 @@ export default async function UsersPage(props: {
                             )}
                         </TableBody>
                     </Table>
+                    <PaginationControls totalCount={totalCount} pageSize={PAGE_SIZE} />
                 </CardContent>
             </Card>
         </div>
