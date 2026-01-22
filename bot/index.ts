@@ -63,12 +63,12 @@ bot.command('start', async (ctx) => {
     const user = ctx.from;
     if (!user) return;
 
-    let source = ctx.match ? ctx.match.toString() : 'BOT';
+    const startPayload = ctx.match ? ctx.match.toString() : null;
     let yandexClientId = null;
 
     // Check for Yandex Metrica deep link (ym_...)
-    if (source && source.startsWith('ym_')) {
-        const rawId = source.replace(/^ym_/, '');
+    if (startPayload && startPayload.startsWith('ym_')) {
+        const rawId = startPayload.replace(/^ym_/, '');
         // Restore dots: ym_123_456 -> 123.456
         yandexClientId = rawId.replace(/_/, '.');
     }
@@ -80,7 +80,7 @@ bot.command('start', async (ctx) => {
             username: user.username,
             firstName: user.first_name,
             lastName: user.last_name,
-            source: source,
+            source: 'BOT',
             yandexClientId: yandexClientId,
         },
         create: {
@@ -88,7 +88,7 @@ bot.command('start', async (ctx) => {
             username: user.username,
             firstName: user.first_name,
             lastName: user.last_name,
-            source: source,
+            source: 'BOT',
             yandexClientId: yandexClientId,
         },
     });
@@ -100,7 +100,7 @@ bot.command('start', async (ctx) => {
     await sendMetricaHit({
         clientId: yandexClientId || user.id.toString(),
         target: 'bot_start',
-        label: source || 'direct'
+        label: startPayload || 'direct'
     });
 
     const welcomeMsg = getVal('welcome_message') || `Привет, ${user.first_name}! 👋\nДобро пожаловать в магазин ChatGPT Plus.`;
