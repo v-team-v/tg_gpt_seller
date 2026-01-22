@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { prisma } from '@/lib/prisma';
 import { Badge } from '@/components/ui/badge';
+import { Globe, Bot } from 'lucide-react';
 
 import { Search } from './search';
 import { DateFilter } from '../components/date-filter';
@@ -11,6 +12,7 @@ type OrderWithRelations = {
     amount: number;
     status: string;
     createdAt: Date;
+    source: string;
     product: {
         title: string;
     };
@@ -21,6 +23,7 @@ type OrderWithRelations = {
         firstName: string | null;
         lastName: string | null;
         yandexClientId: string | null;
+        email: string | null;
     };
 };
 
@@ -117,6 +120,7 @@ export default async function OrdersPage(props: {
                     <TableHeader>
                         <TableRow>
                             <TableHead>ID</TableHead>
+                            <TableHead>Src</TableHead>
                             <TableHead>Пользователь</TableHead>
                             <TableHead>Товар</TableHead>
                             <TableHead>Сумма</TableHead>
@@ -133,8 +137,16 @@ export default async function OrdersPage(props: {
                                     {27654423 + order.id}
                                 </TableCell>
                                 <TableCell>
+                                    {order.source === 'WEB' ? (
+                                        <span title="Сайт"><Globe className="w-5 h-5 text-blue-500" /></span>
+                                    ) : (
+                                        <span title="Бот"><Bot className="w-5 h-5 text-purple-500" /></span>
+                                    )}
+                                </TableCell>
+                                <TableCell>
                                     {order.user.firstName} {order.user.lastName} <br />
-                                    <span className="text-xs text-muted-foreground">@{order.user.username}</span>
+                                    {order.user.username && <span className="text-xs text-muted-foreground mr-2">@{order.user.username}</span>}
+                                    {order.user.email && <span className="text-xs text-blue-600 block">{order.user.email}</span>}
                                 </TableCell>
                                 <TableCell>{order.product.title}</TableCell>
                                 <TableCell>{order.amount} ₽</TableCell>

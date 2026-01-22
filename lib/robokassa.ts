@@ -4,6 +4,7 @@ interface PaymentParams {
     amount: number;
     orderId: number;
     description: string;
+    email?: string;
 }
 
 const MERCHANT_LOGIN = process.env.ROBOKASSA_LOGIN || '';
@@ -11,9 +12,9 @@ const PASSWORD_1 = process.env.ROBOKASSA_PASS1 || '';
 const PASSWORD_2 = process.env.ROBOKASSA_PASS2 || '';
 const IS_TEST = false; // User said shop is active
 
-export function generatePaymentUrl({ amount, orderId, description }: PaymentParams): string {
+export function generatePaymentUrl({ amount, orderId, description, email }: PaymentParams): string {
     // Receipt Object
-    const receipt = JSON.stringify({
+    const receiptData: any = {
         sno: "usn_income",
         items: [
             {
@@ -26,7 +27,13 @@ export function generatePaymentUrl({ amount, orderId, description }: PaymentPara
                 payment_object: "service"
             }
         ]
-    });
+    };
+
+    if (email) {
+        receiptData.client = { email };
+    }
+
+    const receipt = JSON.stringify(receiptData);
 
     // Encode Receipt using URLSearchParams to ensure it matches exactly what goes into the URL
     // (URLSearchParams uses '+' for spaces, while encodeURIComponent uses '%20')
@@ -42,10 +49,13 @@ export function generatePaymentUrl({ amount, orderId, description }: PaymentPara
         InvId: orderId.toString(),
         Description: description,
         SignatureValue: signature,
-        // Optional: Culture, Email, etc.
         Culture: 'ru',
         Receipt: receipt
     });
+
+    if (email) {
+        params.append('Email', email);
+    }
     if (IS_TEST) {
         params.append('IsTest', '1');
     }

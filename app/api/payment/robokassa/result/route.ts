@@ -79,17 +79,20 @@ export async function POST(req: NextRequest) {
 
 
         // Notify User
-        try {
-            await bot.api.sendMessage(
-                order.user.telegramId,
-                `✅ Оплата прошла успешно!\n` +
-                `Заказ #${publicOrderId} оплачен.\n` +
-                `Товар: ${order.product.title}\n` +
-                `Свяжитесь с менеджером для получения товара, отправив номер заказа - @manager_gptsub\n\n` +
-                `Спасибо за покупку!`
-            );
-        } catch (e) {
-            console.error('Failed to notify user about payment:', e);
+        // Notify User
+        if (order.user.telegramId) {
+            try {
+                await bot.api.sendMessage(
+                    order.user.telegramId,
+                    `✅ Оплата прошла успешно!\n` +
+                    `Заказ #${publicOrderId} оплачен.\n` +
+                    `Товар: ${order.product.title}\n` +
+                    `Свяжитесь с менеджером для получения товара, отправив номер заказа - @manager_gptsub\n\n` +
+                    `Спасибо за покупку!`
+                );
+            } catch (e) {
+                console.error('Failed to notify user about payment:', e);
+            }
         }
 
         return new NextResponse(`OK${invId}`, { status: 200 });
@@ -159,16 +162,18 @@ export async function GET(req: NextRequest) {
         // Send Analytics
 
 
-        try {
-            await bot.api.sendMessage(
-                order.user.telegramId,
-                `✅ Оплата прошла успешно!\n` +
-                `Заказ #${publicOrderId} оплачен.\n` +
-                `Товар: ${order.product.title}\n` +
-                `Свяжитесь с менеджером для получения товара, отправив номер заказа - @manager_gptsub\n\n` +
-                `Спасибо за покупку!`
-            );
-        } catch (e) { console.error(e); }
+        if (order.user.telegramId) {
+            try {
+                await bot.api.sendMessage(
+                    order.user.telegramId,
+                    `✅ Оплата прошла успешно!\n` +
+                    `Заказ #${publicOrderId} оплачен.\n` +
+                    `Товар: ${order.product.title}\n` +
+                    `Свяжитесь с менеджером для получения товара, отправив номер заказа - @manager_gptsub\n\n` +
+                    `Спасибо за покупку!`
+                );
+            } catch (e) { console.error(e); }
+        }
 
         return new NextResponse(`OK${invId}`, { status: 200 });
     } catch (e) {

@@ -12,7 +12,8 @@ datasource db {
 
 model User {
   id          Int      @id @default(autoincrement())
-  telegramId  String   @unique
+  telegramId  String?  @unique
+  email       String?  @unique
   username    String?
   firstName   String?
   lastName    String?
@@ -46,6 +47,7 @@ model Order {
   product       Product  @relation(fields: [productId], references: [id])
   amount        Float
   status        String   @default("PENDING") // PENDING, PAID, COMPLETED, CANCELED
+  source        String   @default("BOT")     // BOT, WEB
   yookassaId    String?  // Payment ID from Yookassa
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
