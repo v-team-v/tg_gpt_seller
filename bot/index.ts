@@ -63,7 +63,7 @@ bot.command('start', async (ctx) => {
     const user = ctx.from;
     if (!user) return;
 
-    let source = ctx.match ? ctx.match.toString() : null;
+    let source = ctx.match ? ctx.match.toString() : 'BOT';
     let yandexClientId = null;
 
     // Check for Yandex Metrica deep link (ym_...)
