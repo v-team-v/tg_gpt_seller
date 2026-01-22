@@ -13,6 +13,7 @@ import { Search } from '../orders/search'; // Reusing from orders
 import Link from 'next/link';
 
 import { DateFilter } from '../components/date-filter';
+import { PaginationControls } from '@/components/ui/pagination-controls';
 
 export const dynamic = 'force-dynamic';
 

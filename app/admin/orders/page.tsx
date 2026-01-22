@@ -6,6 +6,7 @@ import { Globe, Bot } from 'lucide-react';
 import { Search } from './search';
 import { DateFilter } from '../components/date-filter';
 import { ManualRevenueControl } from './manual-revenue';
+import { PaginationControls } from '@/components/ui/pagination-controls';
 
 type OrderWithRelations = {
     id: number;
@@ -34,6 +35,7 @@ export default async function OrdersPage(props: {
     searchParams: Promise<{
         q?: string;
         date?: string;
+        page?: string;
     }>;
 }) {
     const searchParams = await props.searchParams;
@@ -94,16 +96,25 @@ export default async function OrdersPage(props: {
         };
     }
 
-    const orders = await prisma.order.findMany({
-        where: whereClause,
-        include: {
-            user: true,
-            product: true,
-        },
-        orderBy: {
-            createdAt: 'desc',
-        },
-    }) as unknown as OrderWithRelations[];
+    const page = Number((await props.searchParams).page) || 1;
+    const PAGE_SIZE = 50;
+    const skip = (page - 1) * PAGE_SIZE;
+
+    const [orders, totalCount] = await Promise.all([
+        prisma.order.findMany({
+            where: whereClause,
+            include: {
+                user: true,
+                product: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            take: PAGE_SIZE,
+            skip: skip,
+        }) as unknown as Promise<OrderWithRelations[]>,
+        prisma.order.count({ where: whereClause })
+    ]);
 
     return (
         <div className="space-y-6">
@@ -179,13 +190,15 @@ export default async function OrdersPage(props: {
 
                         {orders.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
+                                <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
                                     Заказов пока нет.
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
+
+                <PaginationControls totalCount={totalCount} pageSize={PAGE_SIZE} />
             </div>
         </div>
     );
