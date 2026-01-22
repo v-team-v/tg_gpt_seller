@@ -8,7 +8,7 @@ interface BotLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
     children: React.ReactNode;
 }
 
-export function BotLink({ className, baseHref = "https://t.me/gpt_sub_bot", children, ...props }: BotLinkProps) {
+export function BotLink({ className, baseHref = `https://t.me/${process.env.NEXT_PUBLIC_BOT_USERNAME || 'gpt_subb_bot'}`, children, ...props }: BotLinkProps) {
     const [href, setHref] = useState(baseHref);
 
     useEffect(() => {
