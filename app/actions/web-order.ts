@@ -8,6 +8,7 @@ interface WebOrderData {
     email: string;
     firstName?: string;
     promoCode?: string;
+    yandexClientId?: string;
 }
 
 export async function checkPromoCode(code: string) {
@@ -37,7 +38,12 @@ export async function checkPromoCode(code: string) {
 
 export async function createWebOrder(data: WebOrderData) {
     try {
-        const { productId, email, firstName, promoCode } = data;
+        const { productId, email, firstName, promoCode, yandexClientId } = data;
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return { error: 'Некорректный формат Email' };
+        }
 
         // 1. Validate Product
         const product = await prisma.product.findUnique({
@@ -77,7 +83,8 @@ export async function createWebOrder(data: WebOrderData) {
                     data: {
                         email,
                         firstName: firstName || 'Web User',
-                        source: 'WEB'
+                        source: 'WEB',
+                        yandexClientId
                     }
                 });
             } catch (e) {
@@ -92,7 +99,15 @@ export async function createWebOrder(data: WebOrderData) {
             if (!user.firstName && firstName) {
                 await prisma.user.update({
                     where: { id: user.id },
-                    data: { firstName }
+                    data: {
+                        firstName: (!user.firstName && firstName) ? firstName : undefined,
+                        yandexClientId: yandexClientId || undefined
+                    }
+                });
+            } else if (yandexClientId) {
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { yandexClientId }
                 });
             }
         }

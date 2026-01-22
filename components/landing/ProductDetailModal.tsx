@@ -47,7 +47,7 @@ export function ProductDetailModal({ isOpen, onClose, product, onSelect }: Produ
                     </div>
                 </div>
 
-                <DialogFooter className="gap-2 sm:gap-0">
+                <DialogFooter className="gap-4 sm:gap-4 mt-6">
                     <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
                         Отмена
                     </Button>

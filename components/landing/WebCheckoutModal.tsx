@@ -70,15 +70,54 @@ export function WebCheckoutModal({ isOpen, onClose, product }: WebCheckoutModalP
             return;
         }
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setError('Некорректный формат Email');
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
 
+        // Get ClientID from Yandex Metrika if available
+        let yandexClientId: string | undefined;
         try {
+            // @ts-ignore
+            if (window.ym) {
+                // @ts-ignore
+                window.ym(106059751, 'getClientID', (clientID) => {
+                    yandexClientId = clientID;
+                });
+            }
+        } catch (e) {
+            console.error('Failed to get ClientID', e);
+        }
+
+        // Wait a bit for callback if needed, or proceed. 
+        // Sync ym call usually works fast enough or we accept it might be missed if async.
+        // Actually, ym getClientID is async callback. We need to wrap it or use a slight delay? 
+        // For simplicity, let's wrap in a promise with timeout.
+
+        try {
+            if (!yandexClientId && typeof window !== 'undefined' && (window as any).ym) {
+                yandexClientId = await new Promise<string | undefined>((resolve) => {
+                    const timeout = setTimeout(() => resolve(undefined), 500);
+                    try {
+                        // @ts-ignore
+                        window.ym(106059751, 'getClientID', (id) => {
+                            clearTimeout(timeout);
+                            resolve(id);
+                        });
+                    } catch { resolve(undefined); }
+                });
+            }
+
             const res = await createWebOrder({
                 productId: product.id,
                 email,
                 firstName: name,
-                promoCode: appliedPromo?.code
+                promoCode: appliedPromo?.code,
+                yandexClientId
             });
 
             if (res.success && res.url) {

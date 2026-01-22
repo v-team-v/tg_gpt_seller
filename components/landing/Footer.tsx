@@ -39,7 +39,7 @@ export function Footer() {
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
                                 <BotLink className="flex items-center gap-2 hover:text-foreground transition-colors">
-                                    <Send size={16} /> gpt_sub_bot
+                                    <Send size={16} /> @{process.env.NEXT_PUBLIC_BOT_USERNAME || 'gpt_subb_bot'}
                                 </BotLink>
                             </li>
                         </ul>

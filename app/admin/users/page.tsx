@@ -36,25 +36,14 @@ export default async function UsersPage(props: {
             { username: { contains: query } },
             { firstName: { contains: query } },
             { telegramId: { contains: query } },
+            { email: { contains: query } },
         ];
     }
 
     if (sourceFilter) {
         where.source = { contains: sourceFilter };
     }
-
-    if (dateFilter) {
-        const start = new Date(dateFilter);
-        start.setHours(0, 0, 0, 0);
-
-        const end = new Date(dateFilter);
-        end.setHours(23, 59, 59, 999);
-
-        where.createdAt = {
-            gte: start,
-            lte: end
-        };
-    }
+    // ... (lines 46-57 unchanged)
 
     const users = await prisma.user.findMany({
         where,
@@ -74,8 +63,8 @@ export default async function UsersPage(props: {
             </div>
 
             <div className="flex gap-4 items-center flex-wrap">
-                <Search placeholder="Поиск по ID, имени, username..." />
-                <Search placeholder="Фильтр по источнику..." queryKey="source" />
+                <Search placeholder="Поиск по ID, user, email..." />
+                <Search placeholder="Фильтр по платформе..." queryKey="source" />
                 <DateFilter />
 
                 {/* Clear Filters */}
@@ -97,9 +86,10 @@ export default async function UsersPage(props: {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>ID</TableHead>
-                                <TableHead>Username</TableHead>
+                                <TableHead>Username / Email</TableHead>
                                 <TableHead>Имя</TableHead>
-                                <TableHead>Источник</TableHead>
+                                <TableHead>Платформа</TableHead>
+                                <TableHead>Источник (Client ID)</TableHead>
                                 <TableHead>Заказов</TableHead>
                                 <TableHead>Дата регистрации</TableHead>
                             </TableRow>
@@ -107,12 +97,14 @@ export default async function UsersPage(props: {
                         <TableBody>
                             {users.map((user) => (
                                 <TableRow key={user.id}>
-                                    <TableCell className="font-mono text-xs">{user.telegramId}</TableCell>
+                                    <TableCell className="font-mono text-xs">{user.telegramId || '-'}</TableCell>
                                     <TableCell>
                                         {user.username ? (
                                             <a href={`https://t.me/${user.username}`} target="_blank" className="text-blue-600 hover:underline">
                                                 @{user.username}
                                             </a>
+                                        ) : user.email ? (
+                                            <span className="text-xs font-mono">{user.email}</span>
                                         ) : (
                                             <span className="text-gray-400">-</span>
                                         )}
@@ -120,10 +112,15 @@ export default async function UsersPage(props: {
                                     <TableCell>{user.firstName} {user.lastName}</TableCell>
                                     <TableCell>
                                         {user.source ? (
-                                            <Badge variant="secondary">{user.source}</Badge>
+                                            <Badge variant={user.source === 'WEB' ? 'default' : 'secondary'}>
+                                                {user.source}
+                                            </Badge>
                                         ) : (
                                             <span className="text-gray-400 text-sm">Не указан</span>
                                         )}
+                                    </TableCell>
+                                    <TableCell className="font-mono text-xs text-muted-foreground">
+                                        {user.yandexClientId || '-'}
                                     </TableCell>
                                     <TableCell>
                                         {user._count.orders > 0 ? (
