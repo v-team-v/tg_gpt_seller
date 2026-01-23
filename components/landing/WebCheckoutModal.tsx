@@ -145,7 +145,7 @@ export function WebCheckoutModal({ isOpen, onClose, product }: WebCheckoutModalP
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md max-h-[92dvh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Оформление подписки</DialogTitle>
                 </DialogHeader>

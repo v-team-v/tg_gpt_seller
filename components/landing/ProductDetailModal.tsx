@@ -20,7 +20,7 @@ interface ProductDetailModalProps {
 export function ProductDetailModal({ isOpen, onClose, product, onSelect }: ProductDetailModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-md max-h-[92dvh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold">{product.title}</DialogTitle>
                 </DialogHeader>
