@@ -60,8 +60,17 @@ export function ProductCardClient({ product, enrichedDescription, features }: Pr
                     </ul>
                 </div>
 
+
+
                 <Button
-                    onClick={() => setIsDetailOpen(true)}
+                    onClick={() => {
+                        // @ts-ignore
+                        if (typeof window !== 'undefined' && window.ym) {
+                            // @ts-ignore
+                            window.ym(106059751, 'reachGoal', 'view_product_site');
+                        }
+                        setIsDetailOpen(true);
+                    }}
                     className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-medium text-base hover:opacity-90 transition-opacity"
                 >
                     Выбрать

@@ -62,9 +62,14 @@ export default async function PaymentSuccessPage({
 
                 <div className="bg-blue-50 p-4 rounded-xl mb-6 text-sm text-blue-800">
                     <p className="mb-2 font-medium">Свяжитесь с менеджером для получения товара, отправив номер заказа.</p>
-                    <a href="https://t.me/manager_gptsub" target="_blank" className="font-bold text-lg hover:underline">
-                        @manager_gptsub
-                    </a>
+                    <div className="flex flex-col gap-1 items-center">
+                        <a href="https://t.me/manager_gptsub" target="_blank" className="font-bold text-lg hover:underline block">
+                            Telegram: manager_gptsub
+                        </a>
+                        <a href="mailto:manager.gptsub@gmail.com" className="font-bold text-lg hover:underline block">
+                            Email: manager.gptsub@gmail.com
+                        </a>
+                    </div>
                 </div>
 
                 <Link href="/" className="text-gray-500 text-sm hover:underline">

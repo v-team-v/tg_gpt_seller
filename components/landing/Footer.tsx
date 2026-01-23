@@ -27,9 +27,9 @@ export function Footer() {
                             <li><Link href="#features" className="hover:text-foreground transition-colors">Процесс активации</Link></li>
                             <li><Link href="#pricing" className="hover:text-foreground transition-colors">Тарифы</Link></li>
                             <li>
-                                <BotLink className="hover:text-foreground transition-colors">
+                                <a href="https://t.me/manager_gptsub" target="_blank" className="hover:text-foreground transition-colors">
                                     Задать вопрос
-                                </BotLink>
+                                </a>
                             </li>
                         </ul>
                     </div>

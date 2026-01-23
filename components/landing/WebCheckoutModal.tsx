@@ -121,6 +121,12 @@ export function WebCheckoutModal({ isOpen, onClose, product }: WebCheckoutModalP
             });
 
             if (res.success && res.url) {
+                // @ts-ignore
+                if (typeof window !== 'undefined' && window.ym) {
+                    // @ts-ignore
+                    window.ym(106059751, 'reachGoal', 'go_to_pay');
+                }
+
                 // Redirect to Robokassa
                 window.location.href = res.url;
             } else {
@@ -161,7 +167,7 @@ export function WebCheckoutModal({ isOpen, onClose, product }: WebCheckoutModalP
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="name">Имя (необязательно)</Label>
+                        <Label htmlFor="name">Имя</Label>
                         <Input
                             id="name"
                             placeholder="Ваше имя"

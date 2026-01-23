@@ -24,9 +24,12 @@ export async function sendManualRevenue(orderId: number, amount: number) {
         }
 
         // Send to Metrica
+        // If order source is WEB, send distinct goal
+        const target = order.source === 'WEB' ? 'payment_success_site' : 'payment_success';
+
         await sendMetricaHit({
             clientId: order.user.yandexClientId,
-            target: 'payment_success',
+            target,
             revenue: amount
         });
 

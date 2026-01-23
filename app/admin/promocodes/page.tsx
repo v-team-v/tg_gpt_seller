@@ -154,7 +154,11 @@ function StatusBadge({ promo }: { promo: any }) {
         return (
             <div className="flex flex-col gap-1">
                 <Badge variant="secondary" className="bg-gray-200 text-gray-700 w-fit">Использован</Badge>
-                {promo.usedBy && <span className="text-xs text-gray-500">@{promo.usedBy.username || promo.usedBy.telegramId}</span>}
+                {promo.usedBy && (
+                    <span className="text-xs text-gray-500">
+                        {promo.usedBy.username ? `@${promo.usedBy.username}` : (promo.usedBy.email || promo.usedBy.telegramId)}
+                    </span>
+                )}
             </div>
         );
     }
@@ -162,7 +166,9 @@ function StatusBadge({ promo }: { promo: any }) {
         return (
             <div className="flex flex-col gap-1">
                 <Badge variant="outline" className="border-blue-500 text-blue-600 w-fit">Активирован</Badge>
-                <span className="text-xs text-gray-500">@{promo.activatedBy.username || promo.activatedBy.telegramId}</span>
+                <span className="text-xs text-gray-500">
+                    {promo.activatedBy.username ? `@${promo.activatedBy.username}` : (promo.activatedBy.email || promo.activatedBy.telegramId)}
+                </span>
             </div>
         );
     }
