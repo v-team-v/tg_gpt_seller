@@ -20,6 +20,7 @@ model User {
   source      String?  // utm source or referer
   yandexClientId String?
   createdAt   DateTime @default(now())
+  lastSeen    DateTime @default(now())
   orders      Order[]
   activatedPromoCodes PromoCode[] @relation("PromoActivation")
   usedPromoCodes      PromoCode[] @relation("PromoUsage")

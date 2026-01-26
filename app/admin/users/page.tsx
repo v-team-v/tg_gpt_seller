@@ -23,6 +23,7 @@ export default async function UsersPage(props: {
         source?: string;
         date?: string;
         page?: string;
+        sort?: string;
     }>;
 }) {
     const searchParams = await props.searchParams;
@@ -58,14 +59,24 @@ export default async function UsersPage(props: {
         };
     }
 
+    const sort = searchParams?.sort || 'created_desc'; // created_desc, seen_desc
+
     const page = Number(searchParams?.page) || 1;
     const PAGE_SIZE = 50;
     const skip = (page - 1) * PAGE_SIZE;
 
+    let orderBy: any = [{ createdAt: 'desc' }, { id: 'desc' }];
+    if (sort === 'seen_desc') {
+        orderBy = [{ lastSeen: 'desc' }, { id: 'desc' }];
+    }
+
+    console.log('[UsersPage] Params:', { sort, page, query });
+    console.log('[UsersPage] OrderBy:', JSON.stringify(orderBy));
+
     const [users, totalCount] = await Promise.all([
         prisma.user.findMany({
             where,
-            orderBy: { createdAt: 'desc' },
+            orderBy,
             include: {
                 _count: {
                     select: { orders: true }
@@ -77,25 +88,44 @@ export default async function UsersPage(props: {
         prisma.user.count({ where })
     ]);
 
+    console.log('[UsersPage] Returned IDs:', users.map(u => u.id).slice(0, 5));
+    console.log('[UsersPage] Returned LastSeen:', users.map(u => u.lastSeen).slice(0, 5));
+
     return (
         <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold tracking-tight">Пользователи</h1>
             </div>
 
-            <div className="flex gap-4 items-center flex-wrap">
-                <Search placeholder="Поиск по ID, user, email..." />
-                <Search placeholder="Фильтр по платформе..." queryKey="source" />
-                <DateFilter />
+            <div className="flex flex-col gap-4">
+                <div className="flex gap-4 items-center flex-wrap">
+                    <Search placeholder="Поиск по ID, user, email..." />
+                    <Search placeholder="Фильтр по платформе..." queryKey="source" />
+                    <DateFilter />
 
-                {/* Clear Filters */}
-                {(query || sourceFilter || dateFilter) && (
-                    <Link href="/admin/users">
-                        <Badge variant="outline" className="cursor-pointer hover:bg-slate-100">
-                            Сбросить
+                    {/* Clear Filters */}
+                    {(query || sourceFilter || dateFilter) && (
+                        <Link href="/admin/users">
+                            <Badge variant="outline" className="cursor-pointer hover:bg-slate-100">
+                                Сбросить фильтры
+                            </Badge>
+                        </Link>
+                    )}
+                </div>
+
+                <div className="flex gap-2 items-center text-sm text-gray-500">
+                    <span>Сортировка:</span>
+                    <Link href={`/admin/users?${new URLSearchParams({ ...searchParams, sort: 'created_desc' })}`}>
+                        <Badge variant={sort === 'created_desc' ? 'default' : 'outline'} className="cursor-pointer">
+                            По регистрации
                         </Badge>
                     </Link>
-                )}
+                    <Link href={`/admin/users?${new URLSearchParams({ ...searchParams, sort: 'seen_desc' })}`}>
+                        <Badge variant={sort === 'seen_desc' ? 'default' : 'outline'} className="cursor-pointer">
+                            По активности
+                        </Badge>
+                    </Link>
+                </div>
             </div>
 
             <Card>
@@ -113,6 +143,7 @@ export default async function UsersPage(props: {
                                 <TableHead>Источник (Client ID)</TableHead>
                                 <TableHead>Заказов</TableHead>
                                 <TableHead>Дата регистрации</TableHead>
+                                <TableHead>П. Активность</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -152,13 +183,17 @@ export default async function UsersPage(props: {
                                     </TableCell>
                                     <TableCell className="text-gray-500 text-sm">
                                         {new Date(user.createdAt).toLocaleString('ru-RU', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
+                                            day: '2-digit', month: '2-digit', year: 'numeric',
+                                            hour: '2-digit', minute: '2-digit',
                                             timeZone: 'Europe/Moscow'
                                         })}
+                                    </TableCell>
+                                    <TableCell className="text-gray-500 text-sm">
+                                        {user.lastSeen ? new Date(user.lastSeen).toLocaleString('ru-RU', {
+                                            day: '2-digit', month: '2-digit', year: 'numeric',
+                                            hour: '2-digit', minute: '2-digit',
+                                            timeZone: 'Europe/Moscow'
+                                        }) : '-'}
                                     </TableCell>
                                 </TableRow>
                             ))}

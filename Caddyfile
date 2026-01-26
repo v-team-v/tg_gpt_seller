@@ -4,7 +4,11 @@
     }
 }
 
-chatgpt-plus.ru, www.chatgpt-plus.ru {
+http://217.198.9.71 {
+    reverse_proxy web:3000
+}
+
+gpt-plus.pro, www.gpt-plus.pro {
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
         X-Content-Type-Options "nosniff"

@@ -87,6 +87,7 @@ export async function createWebOrder(data: WebOrderData) {
                         yandexClientId
                     }
                 });
+                console.log('Created User:', user);
             } catch (e) {
                 console.error('User creation failed', e);
                 // Handle race condition or unique constraint violation if needed

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Купить ChatGPT Plus в России | Оплата картой РФ",
     description: "Оформите подписку ChatGPT Plus из России. Оплата рублевой картой или по QR коду. Активация на ваш личный аккаунт. Выберете подходящий тариф.",
-    url: "https://chatgpt-plus.ru",
+    url: "https://gpt-plus.pro",
     siteName: "ChatGPT Plus Russia",
     type: "website",
     locale: "ru_RU",
@@ -76,11 +76,11 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "ChatGPT Plus",
-              "url": "https://chatgpt-plus.ru",
+              "url": "https://gpt-plus.pro",
               "description": "Доступ к ChatGPT-4 и DALL-E 3 без ограничений в России",
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://chatgpt-plus.ru/?q={search_term_string}",
+                "target": "https://gpt-plus.pro/?q={search_term_string}",
                 "query-input": "required name=search_term_string"
               }
             })

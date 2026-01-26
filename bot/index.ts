@@ -20,6 +20,24 @@ export const bot = new Bot<MyContext>(token);
 // Install simple session middleware
 bot.use(session({ initial: () => ({}) }));
 
+// Middleware: Track Last Seen
+bot.use(async (ctx, next) => {
+    // DEBUG LOG - Unconditional
+    console.log('[Middleware] Traffic detected');
+
+    if (ctx.from) {
+        const userId = ctx.from.id.toString();
+        // DEBUG LOG
+        console.log(`[Middleware] Updating lastSeen for ${userId}`);
+
+        prisma.user.updateMany({
+            where: { telegramId: userId },
+            data: { lastSeen: new Date() }
+        }).catch(err => console.error("Failed to update lastSeen:", err));
+    }
+    await next();
+});
+
 // Logging
 bot.use(async (ctx, next) => {
     const start = Date.now();
@@ -74,15 +92,22 @@ bot.command('start', async (ctx) => {
     }
 
     // Upsert User
+    // Upsert User
+    const updateData: any = {
+        username: user.username,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        source: 'BOT',
+        lastSeen: new Date(),
+    };
+
+    if (yandexClientId) {
+        updateData.yandexClientId = yandexClientId;
+    }
+
     await prisma.user.upsert({
         where: { telegramId: user.id.toString() },
-        update: {
-            username: user.username,
-            firstName: user.first_name,
-            lastName: user.last_name,
-            source: 'BOT',
-            yandexClientId: yandexClientId,
-        },
+        update: updateData,
         create: {
             telegramId: user.id.toString(),
             username: user.username,
@@ -90,6 +115,7 @@ bot.command('start', async (ctx) => {
             lastName: user.last_name,
             source: 'BOT',
             yandexClientId: yandexClientId,
+            lastSeen: new Date(),
         },
     });
 

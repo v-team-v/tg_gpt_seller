@@ -24,7 +24,7 @@ export async function sendMetricaHit({ clientId, target, revenue, category = 'en
             'ec': category,                // Event Category
             'ea': target,                  // Event Action (Goal)
             'el': label,                   // Event Label
-            'dl': 'https://chatgpt-plus.ru/bot-action', // Virtual Page URL
+            'dl': 'https://gpt-plus.pro/bot-action', // Virtual Page URL
             'cu': 'RUB',                   // Currency
         });
 
