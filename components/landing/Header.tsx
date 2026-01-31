@@ -10,7 +10,7 @@ export function Header() {
                     <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                         <Bot size={20} />
                     </div>
-                    <span>ChatGPT Plus</span>
+                    <span>GPT Plus</span>
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">

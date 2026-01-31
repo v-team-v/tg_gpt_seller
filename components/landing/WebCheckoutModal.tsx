@@ -120,6 +120,7 @@ export function WebCheckoutModal({ isOpen, onClose, product }: WebCheckoutModalP
                 yandexClientId
             });
 
+            // @ts-ignore
             if (res.success && res.url) {
                 // @ts-ignore
                 if (typeof window !== 'undefined' && window.ym) {
@@ -128,8 +129,10 @@ export function WebCheckoutModal({ isOpen, onClose, product }: WebCheckoutModalP
                 }
 
                 // Redirect to Robokassa
+                // @ts-ignore
                 window.location.href = res.url;
             } else {
+                // @ts-ignore
                 setError(res.error || 'Ошибка создания заказа');
                 setIsLoading(false);
             }
@@ -177,7 +180,7 @@ export function WebCheckoutModal({ isOpen, onClose, product }: WebCheckoutModalP
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email (для чека и восстановления)</Label>
+                        <Label htmlFor="email">Email</Label>
                         <Input
                             id="email"
                             type="email"

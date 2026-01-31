@@ -13,7 +13,7 @@ export function Footer() {
                             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                                 <Bot size={20} />
                             </div>
-                            <span>ChatGPT Plus</span>
+                            <span>GPT Plus</span>
                         </Link>
                         <p className="text-muted-foreground max-w-sm">
                             Ваш надежный проводник в мир искусственного интеллекта.
@@ -58,7 +58,7 @@ export function Footer() {
                 </div>
 
                 <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-                    <p>© {new Date().getFullYear()} ChatGPT Plus. Все права защищены.</p>
+                    <p>© {new Date().getFullYear()} GPT Plus. Все права защищены.</p>
                     <div className="flex items-center gap-6">
                         <Link href="/rules" className="hover:text-foreground transition-colors">Пользовательское соглашение (оферта)</Link>
                     </div>

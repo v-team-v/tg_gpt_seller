@@ -21,13 +21,13 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Купить ChatGPT Plus в России | Оплата картой РФ",
-  description: "Оформите подписку ChatGPT Plus из России. Оплата рублевой картой или по QR коду. Активация на ваш личный аккаунт. Выберете подходящий тариф.",
+  description: "Оформите подписку ChatGPT Plus из России с гарантией. Оплата картой РФ или по QR коду. Активация на ваш личный или новый аккаунт. Выберете подходящее предложение.",
   keywords: ["chatgpt plus купить", "chatgpt оплата россия", "chatgpt 4 оплатить", "подписка chatgpt plus", "openai оплата карты мир"],
   openGraph: {
     title: "Купить ChatGPT Plus в России | Оплата картой РФ",
-    description: "Оформите подписку ChatGPT Plus из России. Оплата рублевой картой или по QR коду. Активация на ваш личный аккаунт. Выберете подходящий тариф.",
+    description: "Оформите подписку ChatGPT Plus из России с гарантией. Оплата картой РФ или по QR коду. Активация на ваш личный или новый аккаунт. Выберете подходящее предложение.",
     url: "https://gpt-plus.pro",
-    siteName: "ChatGPT Plus Russia",
+    siteName: "GPT Plus Russia",
     type: "website",
     locale: "ru_RU",
     images: [
@@ -35,14 +35,14 @@ export const metadata: Metadata = {
         url: "/icon.png",
         width: 512,
         height: 512,
-        alt: "ChatGPT Plus Logo",
+        alt: "GPT Plus Logo",
       },
     ],
   },
   twitter: {
     card: "summary",
     title: "Купить ChatGPT Plus в России | Оплата картой РФ",
-    description: "Оформите подписку ChatGPT Plus из России. Оплата рублевой картой или по QR коду. Активация на ваш личный аккаунт. Выберете подходящий тариф.",
+    description: "Оформите подписку ChatGPT Plus из России с гарантией. Оплата картой РФ или по QR коду. Активация на ваш личный или новый аккаунт. Выберете подходящее предложение.",
     images: ["/icon.png"],
   },
   other: {
@@ -75,9 +75,9 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "name": "ChatGPT Plus",
+              "name": "GPT Plus",
               "url": "https://gpt-plus.pro",
-              "description": "Доступ к ChatGPT-4 и DALL-E 3 без ограничений в России",
+              "description": "Оформите подписку ChatGPT Plus из России с гарантией. Оплата картой РФ или по QR коду.",
               "potentialAction": {
                 "@type": "SearchAction",
                 "target": "https://gpt-plus.pro/?q={search_term_string}",

@@ -2,6 +2,7 @@
 import { Bot, session, Context, SessionFlavor, InlineKeyboard, Keyboard } from 'grammy';
 import { sendMetricaHit } from '../lib/analytics';
 import { prisma } from '../lib/prisma';
+import { wata } from '../lib/wata';
 
 interface SessionData {
     step?: 'WAITING_FOR_PROMO';
@@ -353,7 +354,7 @@ bot.callbackQuery(/view_product_(\d+)/, async (ctx) => {
     await sendMetricaHit({
         clientId: viewingUser?.yandexClientId || userId,
         target: 'view_product',
-        label: product.title // Or ID
+        label: product.title
     });
 
     const caption = `<b>${product.title}</b>\n\n${product.description}\n\nЦена: ${priceDisplay}`;
@@ -418,6 +419,7 @@ bot.callbackQuery("back_to_catalog", async (ctx) => {
 
 
 // Create Order & Show Invoice
+// Create Order & Show Invoice
 bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
     const productId = parseInt(ctx.match[1]);
     const userId = ctx.from.id.toString();
@@ -432,7 +434,9 @@ bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
         where: { telegramId: userId },
         include: { activatedPromoCodes: true }
     });
+
     if (!dbUser) {
+        // Should not happen as middleware/start upserts
         await ctx.answerCallbackQuery("Пользователь не найден");
         return;
     }
@@ -440,7 +444,7 @@ bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
     // Apply Promo
     const activePromo = dbUser.activatedPromoCodes.find(p => !p.isUsed);
     let finalAmount = product.price;
-    let promoCodeId = undefined;
+    let promoCodeId = null;
 
     if (activePromo) {
         finalAmount = Math.max(0, product.price - activePromo.discountAmount);
@@ -468,38 +472,42 @@ bot.callbackQuery(/create_order_(\d+)/, async (ctx) => {
     await ctx.answerCallbackQuery();
     try { await ctx.deleteMessage(); } catch (e) { }
 
-    const publicOrderId = 27654423 + order.id;
-    const now = new Date();
-    const until = new Date(now.getTime() + 15 * 60000);
-    const timeString = until.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    const ORDER_ID_OFFSET = 27654423;
+    const publicOrderId = order.id + ORDER_ID_OFFSET;
 
-    let priceLine = `<b>Цена:</b> ${product.price} ₽`;
-    if (activePromo) {
-        priceLine = `<b>Цена:</b> <s>${product.price} ₽</s> <b>${finalAmount} ₽</b> (Промокод ${activePromo.code})`;
-    }
+    // Wata Payment Link
+    try {
+        const payment = await wata.createPaymentLink({
+            amount: finalAmount,
+            orderId: String(publicOrderId),
+            description: `Оплата заказа #${publicOrderId} (${product.title})`,
+            successRedirectUrl: `https://gpt-plus.pro/payment/success?InvId=${publicOrderId}`
+        });
 
-    const text =
-        `➖➖➖➖➖➖➖➖➖➖➖
+        let priceLine = `<b>Цена:</b> ${product.price} ₽`;
+        if (activePromo) {
+            priceLine = `<b>Цена:</b> <s>${product.price} ₽</s> <b>${finalAmount} ₽</b> (Промокод ${activePromo.code})`;
+        }
+
+        const text =
+            `➖➖➖➖➖➖➖➖➖➖➖
 <b>Товар:</b> ${product.title}
 ${priceLine}
-<b>Заказ:</b> ${publicOrderId}
+<b>Заказ:</b> #${publicOrderId}
 ➖➖➖➖➖➖➖➖➖➖➖
-Для оплаты перейдите по ссылке!
-Счет на оплату актуален 15 минут
-Необходимо оплатить до ${timeString}
+Для оплаты нажмите кнопку ниже.
+Ссылка действительна 30 минут.
 ➖➖➖➖➖➖➖➖➖➖➖`;
 
-    const { generatePaymentUrl } = require('../lib/robokassa');
-    const paymentUrl = generatePaymentUrl({
-        amount: finalAmount,
-        orderId: publicOrderId,
-        description: `Оплата заказа #${publicOrderId} (ChatGPT Plus)`
-    });
+        const keyboard = new InlineKeyboard()
+            .url(`Оплатить ${finalAmount} ₽`, payment.url);
 
-    const keyboard = new InlineKeyboard()
-        .url(`Оплатить ${finalAmount} ₽`, paymentUrl);
+        await ctx.reply(text, { parse_mode: "HTML", reply_markup: keyboard });
 
-    await ctx.reply(text, { parse_mode: "HTML", reply_markup: keyboard });
+    } catch (e) {
+        console.error("Payment Link Error:", e);
+        await ctx.reply("Произошла ошибка при создании ссылки на оплату. Попробуйте позже.");
+    }
 });
 
 // ... History Handler ... (unchanged part skipped for brevity, will keep using previous block if not replacing whole)

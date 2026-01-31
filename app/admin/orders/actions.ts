@@ -8,7 +8,7 @@ export async function sendManualRevenue(orderId: number, amount: number) {
     try {
         const order = await prisma.order.findUnique({
             where: { id: orderId },
-            include: { user: true }
+            include: { user: true, product: true }
         });
 
         if (!order) {
@@ -19,8 +19,10 @@ export async function sendManualRevenue(orderId: number, amount: number) {
             return { error: 'Доход уже отправлен' };
         }
 
-        if (!order.user.yandexClientId) {
-            return { error: 'У пользователя нет Yandex Client ID' };
+        const clientId = order.user.yandexClientId || order.user.telegramId;
+
+        if (!clientId) {
+            return { error: 'У пользователя нет Yandex Client ID или Telegram ID' };
         }
 
         // Send to Metrica
@@ -28,9 +30,11 @@ export async function sendManualRevenue(orderId: number, amount: number) {
         const target = order.source === 'WEB' ? 'payment_success_site' : 'payment_success';
 
         await sendMetricaHit({
-            clientId: order.user.yandexClientId,
+            clientId: clientId,
             target,
-            revenue: amount
+            revenue: amount,
+            action: 'purchase',
+            productName: order.product.title
         });
 
         // Update Order

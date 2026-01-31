@@ -25,6 +25,7 @@ type OrderWithRelations = {
         lastName: string | null;
         yandexClientId: string | null;
         email: string | null;
+        telegramId: string | null;
     };
 };
 
@@ -166,7 +167,7 @@ export default async function OrdersPage(props: {
                                         orderId={order.id}
                                         initialIsSent={order.isRevenueSent}
                                         initialAmount={order.sentRevenueAmount}
-                                        hasClientId={!!order.user.yandexClientId}
+                                        hasClientId={!!(order.user.yandexClientId || order.user.telegramId)}
                                     />
                                 </TableCell>
                                 <TableCell>

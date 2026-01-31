@@ -36,6 +36,9 @@ export async function checkPromoCode(code: string) {
     }
 }
 
+// Wata.pro Integration
+import { wata } from '@/lib/wata';
+
 export async function createWebOrder(data: WebOrderData) {
     try {
         const { productId, email, firstName, promoCode, yandexClientId } = data;
@@ -71,13 +74,11 @@ export async function createWebOrder(data: WebOrderData) {
         }
 
         // 3. Find or Create User
-        // We use email as the key identifier for web users
         let user = await prisma.user.findUnique({
             where: { email },
         });
 
         if (!user) {
-            // Note: telegramId is optional now
             try {
                 user = await prisma.user.create({
                     data: {
@@ -87,16 +88,11 @@ export async function createWebOrder(data: WebOrderData) {
                         yandexClientId
                     }
                 });
-                console.log('Created User:', user);
             } catch (e) {
                 console.error('User creation failed', e);
-                // Handle race condition or unique constraint violation if needed
-                // But finding by email unique should be safe
                 return { error: 'Ошибка создания пользователя' };
             }
         } else {
-            // Update firstName if provided and not present? Or strictly keep existing?
-            // Let's keep existing to rely on "first contact" or update if null.
             if (!user.firstName && firstName) {
                 await prisma.user.update({
                     where: { id: user.id },
@@ -125,19 +121,25 @@ export async function createWebOrder(data: WebOrderData) {
             }
         });
 
-        // 5. Generate Payment Link
-        // Public ID logic: offset + ID
+        // 5. Generate Payment Link (Wata.pro)
         const ORDER_ID_OFFSET = 27654423;
         const publicOrderId = order.id + ORDER_ID_OFFSET;
 
-        const paymentUrl = generatePaymentUrl({
+        const payment = await wata.createPaymentLink({
             amount: finalAmount,
-            orderId: publicOrderId,
+            orderId: String(publicOrderId),
             description: `Оплата заказа #${publicOrderId} (${product.title})`,
-            email: email
+            // successRedirectUrl is configured in dashboard, but can be overridden:
+            // successRedirectUrl: `https://gpt-plus.pro/payment/success?InvId=${publicOrderId}`,
+            // Let's rely on dashboard or pass explicit to be safe if dashboard fails?
+            // Docs say dashboard settings are used if not passed.
+            // Assuming Success Page needs InvId to identify order.
+            // Wata might NOT append query params automatically to dashboard URL.
+            // BETTER: Explicitly pass success URL with our params.
+            successRedirectUrl: `https://gpt-plus.pro/payment/success?InvId=${publicOrderId}`,
         });
 
-        return { success: true, url: paymentUrl };
+        return { success: true, url: payment.url };
 
     } catch (error) {
         console.error('Create Web Order Error:', error);
