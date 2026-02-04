@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
             await sendMetricaHit({
                 clientId: adminId,
                 target: 'payment_success',
-                price: amount
+                revenue: amount
             });
         } catch (e) {
             console.error('Failed to send analytics hit:', e);
