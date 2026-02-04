@@ -134,18 +134,7 @@ export async function POST(req: NextRequest) {
                 console.error('Failed to send user notification', e);
             }
         }
-        // Analytics: payment_success
-        try {
-            // We prioritize yandexClientId if available, otherwise fallback to telegramId or email or just internal ID
-            const adminId = order.user.yandexClientId || order.user.telegramId || order.user.id.toString();
-            await sendMetricaHit({
-                clientId: adminId,
-                target: 'payment_success',
-                revenue: amount
-            });
-        } catch (e) {
-            console.error('Failed to send analytics hit:', e);
-        }
+
 
         return NextResponse.json({ success: true });
 
