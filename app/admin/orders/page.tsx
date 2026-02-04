@@ -7,6 +7,7 @@ import { Search } from './search';
 import { DateFilter } from '../components/date-filter';
 import { ManualRevenueControl } from './manual-revenue';
 import { PaginationControls } from '@/components/ui/pagination-controls';
+import { TokenModal } from './token-modal';
 
 type OrderWithRelations = {
     id: number;
@@ -14,6 +15,7 @@ type OrderWithRelations = {
     status: string;
     createdAt: Date;
     source: string;
+    sessionToken: string | null;
     product: {
         title: string;
     };
@@ -136,6 +138,7 @@ export default async function OrdersPage(props: {
                             <TableHead>Пользователь</TableHead>
                             <TableHead>Товар</TableHead>
                             <TableHead>Сумма</TableHead>
+                            <TableHead>Token</TableHead>
                             <TableHead>Revenue</TableHead>
                             <TableHead>Статус</TableHead>
                             <TableHead>Дата</TableHead>
@@ -162,6 +165,9 @@ export default async function OrdersPage(props: {
                                 </TableCell>
                                 <TableCell>{order.product.title}</TableCell>
                                 <TableCell>{order.amount} ₽</TableCell>
+                                <TableCell>
+                                    <TokenModal token={order.sessionToken} />
+                                </TableCell>
                                 <TableCell>
                                     <ManualRevenueControl
                                         orderId={order.id}

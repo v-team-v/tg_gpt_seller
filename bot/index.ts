@@ -175,7 +175,7 @@ bot.hears("ChatGPT Plus", async (ctx) => {
     const activePromo = dbUser?.activatedPromoCodes.find(p => !p.isUsed);
 
     const products = await prisma.product.findMany({
-        where: { isActive: true },
+        where: { isActive: true, isShowBot: true },
         orderBy: { sortOrder: 'asc' }
     });
 
@@ -401,7 +401,7 @@ bot.callbackQuery("back_to_catalog", async (ctx) => {
     try { await ctx.deleteMessage(); } catch (e) { }
 
     const products = await prisma.product.findMany({
-        where: { isActive: true },
+        where: { isActive: true, isShowBot: true },
         orderBy: { sortOrder: 'asc' }
     });
 

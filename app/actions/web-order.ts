@@ -9,6 +9,7 @@ interface WebOrderData {
     firstName?: string;
     promoCode?: string;
     yandexClientId?: string;
+    sessionToken?: string;
 }
 
 export async function checkPromoCode(code: string) {
@@ -41,7 +42,7 @@ import { wata } from '@/lib/wata';
 
 export async function createWebOrder(data: WebOrderData) {
     try {
-        const { productId, email, firstName, promoCode, yandexClientId } = data;
+        const { productId, email, firstName, promoCode, yandexClientId, sessionToken } = data;
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -117,7 +118,8 @@ export async function createWebOrder(data: WebOrderData) {
                 amount: finalAmount,
                 status: 'PENDING',
                 source: 'WEB',
-                promoCodeId
+                promoCodeId,
+                sessionToken
             }
         });
 

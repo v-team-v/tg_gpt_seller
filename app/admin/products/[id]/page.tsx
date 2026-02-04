@@ -40,7 +40,7 @@ export default async function EditProductPage(props: { params: Promise<{ id: str
 
                         <div className="grid gap-2">
                             <Label htmlFor="description">Описание</Label>
-                            <Textarea id="description" name="description" defaultValue={product.description} required rows={5} />
+                            <Textarea id="description" name="description" defaultValue={product.description} rows={5} />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -60,6 +60,42 @@ export default async function EditProductPage(props: { params: Promise<{ id: str
                                         <SelectItem value="ACCOUNT">Аккаунт</SelectItem>
                                     </SelectContent>
                                 </Select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 rounded-lg border p-4">
+                            <h3 className="text-sm font-medium">Настройки видимости</h3>
+                            <div className="grid gap-4 sm:grid-cols-3">
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        id="isShowLanding"
+                                        name="isShowLanding"
+                                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                        defaultChecked={product.isShowLanding}
+                                    />
+                                    <Label htmlFor="isShowLanding" className="font-normal cursor-pointer">На Лендинге</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        id="isShowBot"
+                                        name="isShowBot"
+                                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                        defaultChecked={product.isShowBot}
+                                    />
+                                    <Label htmlFor="isShowBot" className="font-normal cursor-pointer">В Боте</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        id="isShowBuyPage"
+                                        name="isShowBuyPage"
+                                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                        defaultChecked={product.isShowBuyPage}
+                                    />
+                                    <Label htmlFor="isShowBuyPage" className="font-normal cursor-pointer">На /buy</Label>
+                                </div>
                             </div>
                         </div>
 

@@ -10,6 +10,9 @@ export async function createProduct(formData: FormData) {
     const description = formData.get('description') as string;
     const price = parseFloat(formData.get('price') as string);
     const type = formData.get('type') as string;
+    const isShowLanding = formData.get('isShowLanding') === 'on';
+    const isShowBot = formData.get('isShowBot') === 'on';
+    const isShowBuyPage = formData.get('isShowBuyPage') === 'on';
 
     // Handle Image Upload
     const imageFile = formData.get('image') as File;
@@ -22,6 +25,9 @@ export async function createProduct(formData: FormData) {
             price,
             type,
             imageUrl,
+            isShowLanding,
+            isShowBot,
+            isShowBuyPage
         },
     });
 
@@ -34,6 +40,12 @@ export async function updateProduct(id: number, formData: FormData) {
     const description = formData.get('description') as string;
     const price = parseFloat(formData.get('price') as string);
     const type = formData.get('type') as string;
+
+    // Visibility flags - defaults to false if not present in formData (unchecked)
+    // Note: ensure checkboxes in UI have 'defaultChecked' or similar if editing
+    const isShowLanding = formData.get('isShowLanding') === 'on';
+    const isShowBot = formData.get('isShowBot') === 'on';
+    const isShowBuyPage = formData.get('isShowBuyPage') === 'on';
 
     const currentProduct = await prisma.product.findUnique({ where: { id } });
 
@@ -53,7 +65,10 @@ export async function updateProduct(id: number, formData: FormData) {
             description,
             price,
             type,
-            imageUrl
+            imageUrl,
+            isShowLanding,
+            isShowBot,
+            isShowBuyPage
         }
     });
 

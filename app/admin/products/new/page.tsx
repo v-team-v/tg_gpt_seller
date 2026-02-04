@@ -22,7 +22,7 @@ export default function NewProductPage() {
 
                         <div className="grid gap-2">
                             <Label htmlFor="description">Описание</Label>
-                            <Textarea id="description" name="description" placeholder="Описание товара..." required />
+                            <Textarea id="description" name="description" placeholder="Описание товара..." />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -41,6 +41,41 @@ export default function NewProductPage() {
                                         <option value="SUBSCRIPTION">Подписка</option>
                                         <option value="ACCOUNT">Аккаунт</option>
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 rounded-lg border p-4">
+                            <h3 className="text-sm font-medium">Настройки видимости</h3>
+                            <div className="grid gap-4 sm:grid-cols-3">
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        id="isShowLanding"
+                                        name="isShowLanding"
+                                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                        defaultChecked
+                                    />
+                                    <Label htmlFor="isShowLanding" className="font-normal cursor-pointer">На Лендинге</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        id="isShowBot"
+                                        name="isShowBot"
+                                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                        defaultChecked
+                                    />
+                                    <Label htmlFor="isShowBot" className="font-normal cursor-pointer">В Боте</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        id="isShowBuyPage"
+                                        name="isShowBuyPage"
+                                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                    />
+                                    <Label htmlFor="isShowBuyPage" className="font-normal cursor-pointer">На /buy</Label>
                                 </div>
                             </div>
                         </div>

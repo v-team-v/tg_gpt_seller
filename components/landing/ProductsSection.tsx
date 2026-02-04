@@ -35,7 +35,10 @@ const PRODUCT_DESCRIPTIONS: Record<string, { description: string, features: stri
 
 export async function ProductsSection() {
     const products = await prisma.product.findMany({
-        where: { isActive: true },
+        where: {
+            isActive: true,
+            isShowBuyPage: false
+        },
         orderBy: { sortOrder: 'asc' }
     });
 
