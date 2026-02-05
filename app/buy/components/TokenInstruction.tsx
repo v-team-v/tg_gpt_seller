@@ -21,7 +21,7 @@ export function TokenInstruction() {
                     Как получить токен?
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-md max-h-[92dvh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Инструкция по получению токена</DialogTitle>
                     <DialogDescription>
@@ -87,6 +87,12 @@ export function TokenInstruction() {
                             />
                         </div>
                     </div>
+                </div>
+
+                <div className="flex justify-end pt-2">
+                    <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full sm:w-auto">Понятно, закрыть</Button>
+                    </DialogTrigger>
                 </div>
             </DialogContent>
         </Dialog>
