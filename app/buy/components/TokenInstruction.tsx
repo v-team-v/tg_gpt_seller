@@ -21,9 +21,9 @@ export function TokenInstruction() {
                     Как получить токен?
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md max-h-[92dvh] overflow-y-auto">
+            <DialogContent className="w-[95vw] sm:max-w-md max-h-[85dvh] overflow-y-auto rounded-xl">
                 <DialogHeader>
-                    <DialogTitle>Инструкция по получению токена</DialogTitle>
+                    <DialogTitle>Как получить токен (Инструкция)</DialogTitle>
                     <DialogDescription>
                         Для продления подписки нам необходим ваш Session Token. Следуйте инструкции ниже.
                     </DialogDescription>
